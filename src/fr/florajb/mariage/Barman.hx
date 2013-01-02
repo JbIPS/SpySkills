@@ -149,7 +149,13 @@ class Barman extends Sprite
 		score += command.points;
 		updateScore();
 		
-		Actuate.tween(command, 0.9, { x: Lib.current.stage.stageWidth } );
+		Actuate.tween(command, 0.2, { x: Lib.current.stage.stageWidth } ).onComplete(removeChild, [command]);
+		
+		for (com in currentCommands) {
+			if (com.y > command.y) {
+				Actuate.tween(com, 0.9, { y: com.y-com.height-10 } );
+			}
+		}
 		
 		//addCommand();
 	}
