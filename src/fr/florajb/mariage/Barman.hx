@@ -1,6 +1,7 @@
 package fr.florajb.mariage;
 
 import com.eclecticdesignstudio.motion.Actuate;
+import com.eclecticdesignstudio.motion.easing.Cubic;
 import haxe.FastList;
 import nme.Assets;
 import nme.display.Bitmap;
@@ -30,8 +31,12 @@ class Barman extends Sprite
 	private var result: TextField;
 	private var score: Int;
 	private var scoreField: TextField;
+	private var timerField: TextField;
 	private var startTime: Int;
-	private var elapsedTime: Float;
+	private var elapsedTime: Int;
+	private var lastCommandTime: Int;
+	private var level: Int;
+	private var objective: Int;
 	
 	private var ingredients: Array<String>;
 	private var currentCommands: List<Command>;
@@ -45,6 +50,8 @@ class Barman extends Sprite
 		currentCommands = new List<Command>();
 		pointScale = new Hash<Int>();
 		scoreField = new TextField();
+		timerField = new TextField();
+		level = 1;
 		initCookbook();
 		
 		#if iphone
@@ -57,6 +64,8 @@ class Barman extends Sprite
 
 	private function init(e: Event) 
 	{
+		removeEventListener(MouseEvent.CLICK, init);
+		
 		shaker = new Bitmap(Assets.getBitmapData("img/shaker.png"));
 		shaker.scaleX = shaker.scaleY = 0.5;
 		var shakerSprite = new Sprite();
@@ -84,11 +93,21 @@ class Barman extends Sprite
 		tomato.addEventListener(MouseEvent.CLICK, onIngredientClick);
 		addChild(tomato);
 		
-		scoreField.defaultTextFormat = new TextFormat(17, 0xFFFFFF, TextFormatAlign.CENTER);
+		var scoreFormat = new TextFormat(17, 0xFFFFFF, TextFormatAlign.CENTER);
+		
+		scoreField.defaultTextFormat = scoreFormat;
 		scoreField.selectable = scoreField.mouseEnabled = false;
 		updateScore();
 		scoreField.width = Lib.current.stage.stageWidth;
+		scoreField.x = 0;
 		addChild(scoreField);
+		
+		timerField.defaultTextFormat = scoreFormat;
+		timerField.selectable = timerField.mouseEnabled = false;
+		updateTimer();
+		timerField.y = Lib.current.stage.stageHeight - timerField.height;
+		timerField.x = Lib.current.stage.stageWidth - timerField.width;
+		addChild(timerField);
 		
 		startGame();
 	}
@@ -96,6 +115,7 @@ class Barman extends Sprite
 	private function startGame() : Void 
 	{
 		startTime = Lib.getTimer();
+		objective = 500 * level;
 		addCommand();
 	}
 	
@@ -105,15 +125,14 @@ class Barman extends Sprite
 		
 		for (command in currentCommands) {
 			if (command.cocktail.equalsRecipe(ingredients)) {
-				//addChild(command.cocktail.icon);
 				currentCommands.remove(command);
 				validateCommand(command);
+				break;
 			}
 		}
 		
 		result.text = "";
-		while (ingredients.length != 0)
-			ingredients.pop();
+		clearIngredients();
 	}
 	
 	private function validateCommand(command: Command) : Void 
@@ -132,13 +151,13 @@ class Barman extends Sprite
 		
 		Actuate.tween(command, 0.9, { x: Lib.current.stage.stageWidth } );
 		
-		addCommand();
+		//addCommand();
 	}
 	
 	private function initCookbook():Void 
 	{
-		var bloody: Cocktail = new Cocktail("Bloody Mary", new Bitmap(Assets.getBitmapData("img/bloodymary.png")), [ "vodka", "tomato" ]);
-		var vodka: Cocktail = new Cocktail("Vodka", new Bitmap(Assets.getBitmapData("img/bloodymary.png")), [ "vodka"]);
+		var bloody: Cocktail = new Cocktail("Bloody Mary", Assets.getBitmapData("img/bloodymary.png"), [ "vodka", "tomato" ]);
+		var vodka: Cocktail = new Cocktail("Vodka", Assets.getBitmapData("img/bloodymary.png"), [ "vodka"]);
 		
 		cookbook.set("bloodymary", bloody);
 		pointScale.set("bloodymary", 500);
@@ -148,12 +167,13 @@ class Barman extends Sprite
 	
 	private function addCommand() : Void 
 	{
+		lastCommandTime = Lib.getTimer();
 		var numCommand = currentCommands.length;
 		var command = new Command();
 		command.x = Lib.current.stage.stageWidth;
 		command.y = 50 + (numCommand*command.height + 10);
 		currentCommands.add(command);
-		Actuate.tween(command, 0.9, { x: Lib.current.stage.stageWidth - command.width } ).delay(0.1);
+		Actuate.tween(command, 0.9, { x: Lib.current.stage.stageWidth - command.width } ).ease(Cubic.easeOut).delay(0.1);
 		addChild(command);
 	}
 	
@@ -172,15 +192,55 @@ class Barman extends Sprite
 		scoreField.text = "Score: " + score;
 	}
 	
+	private function updateTimer() : Void 
+	{
+		timerField.text = Std.string(30 - elapsedTime) + "s";
+	}
+	
 	private function onEnterFrame(e: Event) : Void 
 	{
-		elapsedTime = (Lib.getTimer() - startTime) / 1000;
+		elapsedTime = Math.round((Lib.getTimer() - startTime) / 1000);
+		updateTimer();
 		if (elapsedTime > 30) {
-			//Fin
-			while (numChildren > 0)
-				removeChildAt(numChildren - 1);
-			scoreField.y = Lib.current.stage.stageHeight / 2;
-			addChild(scoreField);
+			endLevel();
 		}
+		else if (Math.round((Lib.getTimer() - lastCommandTime)/1000) > 3) {
+			if(currentCommands.length < level)
+				addCommand();
+		}
+	}
+	
+	private function endLevel() : Void 
+	{
+		clearStage();
+		clearCommands();
+		clearIngredients();
+		scoreField.y = Lib.current.stage.stageHeight / 2;
+		addChild(scoreField);
+		
+		if (score >= objective) {
+			level++;
+			addEventListener(MouseEvent.CLICK, init);
+		}
+		score = 0;
+		
+	}
+	
+	private function clearStage() : Void 
+	{
+		while (numChildren > 0)
+			removeChildAt(numChildren - 1);
+	}
+	
+	private function clearIngredients():Void 
+	{
+		while (ingredients.length != 0)
+			ingredients.pop();
+	}
+	
+	private function clearCommands():Void 
+	{
+		while (!currentCommands.isEmpty())
+			currentCommands.pop();
 	}
 }

@@ -37,7 +37,7 @@ class Command extends Sprite
 		points = Barman.pointScale.get(StringTools.replace(cocktail.name.toLowerCase(), " ", ""));
 		Lib.trace("next recipe: " + nextRecipe.name);
 		
-		var icon: Bitmap = nextRecipe.icon;
+		var icon: Bitmap = new Bitmap(nextRecipe.icon);
 		icon.scaleX = icon.scaleY = 0.3;
 		icon.x = icon.y = 10;
 		addChild(icon);

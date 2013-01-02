@@ -1,6 +1,5 @@
 package fr.florajb.mariage;
-import haxe.FastList;
-import nme.display.Bitmap;
+import nme.display.BitmapData;
 
 /**
  * ...
@@ -10,11 +9,11 @@ import nme.display.Bitmap;
 class Cocktail
 {
 
-	public var icon: Bitmap;
+	public var icon: BitmapData;
 	public var name: String;
 	public var recipe: Array<String>;
 	
-	public function new(name: String, icon: Bitmap, recipe: Array<String>) 
+	public function new(name: String, icon: BitmapData, recipe: Array<String>) 
 	{
 		this.name = name;
 		this.icon = icon;
