@@ -3,10 +3,10 @@
 	<!-- NMML reference: https://gist.github.com/1763850 -->
 	
 	<!-- metadata, make sure 'package' is at least 3 segments (ie. com.mycompany.myproject) -->
-	<meta title="MissionMariage" package="fr.florajb.mariage.MissionMariage" version="1.0.0" company="jbrichardet" />
+	<meta title="SpySkills" package="fr.florajb.mariage" version="1.0.0" company="jbrichardet" />
 	
 	<!-- output -->
-	<app main="fr.florajb.mariage.Main" file="MissionMariage" path="bin" />
+	<app main="fr.florajb.mariage.Main" file="SpySkills" path="bin" />
 	
 	<window background="#000000" fps="60" />
 	<window width="800" height="480" unless="mobile" />

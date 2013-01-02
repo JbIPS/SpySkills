@@ -13,7 +13,9 @@ import nme.text.TextFormat;
 
 class Command extends Sprite
 {
-
+	public var cocktail: Cocktail;
+	public var points: Int;
+	
 	public function new() 
 	{
 		super();
@@ -21,30 +23,32 @@ class Command extends Sprite
 		board.scaleX = board.scaleY = 0.2;
 		addChild(board);
 		
-		var nextRecipe: String = "";
+		var nextRecipe: Cocktail = null;
 		var bestScore: Float = 0;
-		for (recipe in Main.cookbook.keys()) {
+		for (icon in Barman.cookbook.keys()) {
 			var score = Math.random();
 			if (score > bestScore) {
 				bestScore = score;
-				nextRecipe = recipe;
+				nextRecipe = Barman.cookbook.get(icon);
 			}
 		}
 		
-		Lib.trace("next recipe: " + nextRecipe);
+		cocktail = nextRecipe;
+		points = Barman.pointScale.get(StringTools.replace(cocktail.name.toLowerCase(), " ", ""));
+		Lib.trace("next recipe: " + nextRecipe.name);
 		
-		////////
-		var recipe: Bitmap = new Bitmap(Assets.getBitmapData("img/bloodymary.png"));
-		recipe.scaleX = recipe.scaleY = 0.3;
-		recipe.x = recipe.y = 10;
-		addChild(recipe);
+		var icon: Bitmap = nextRecipe.icon;
+		icon.scaleX = icon.scaleY = 0.3;
+		icon.x = icon.y = 10;
+		addChild(icon);
+		
 		var recipeName = new TextField();
+		recipeName.selectable = recipeName.mouseEnabled = false;
 		recipeName.defaultTextFormat = new TextFormat("_sans", 10);
-		recipeName.text = "Bloody Mary";
+		recipeName.text = nextRecipe.name;
 		recipeName.x = board.width / 2;
 		recipeName.y = board.height / 2 - 8;
 		addChild(recipeName);
-		///////
 	}
 	
 }
