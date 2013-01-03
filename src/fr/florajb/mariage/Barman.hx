@@ -30,13 +30,14 @@ class Barman extends Sprite
 	private var tomato: Bottle;
 	private var result: TextField;
 	private var score: Int;
-	private var scoreField: TextField;
-	private var timerField: TextField;
 	private var startTime: Int;
 	private var elapsedTime: Int;
 	private var lastCommandTime: Int;
 	private var level: Int;
 	private var objective: Int;
+	private var scoreField: TextField;
+	private var timerField: TextField;
+	private var levelField: TextField;
 	
 	private var ingredients: Array<String>;
 	private var currentCommands: List<Command>;
@@ -51,6 +52,7 @@ class Barman extends Sprite
 		pointScale = new Hash<Int>();
 		scoreField = new TextField();
 		timerField = new TextField();
+		levelField = new TextField();
 		level = 1;
 		initCookbook();
 		
@@ -66,11 +68,17 @@ class Barman extends Sprite
 	{
 		removeEventListener(MouseEvent.CLICK, init);
 		
+		var bkg = new Bitmap(Assets.getBitmapData("img/Background.png"));
+		addChild(bkg);
+		
 		shaker = new Bitmap(Assets.getBitmapData("img/shaker.png"));
-		shaker.scaleX = shaker.scaleY = 0.5;
+		shaker.scaleX = shaker.scaleY = 0.3;
+		shaker.x = 450;
+		shaker.y = 20;
 		var shakerSprite = new Sprite();
 		shakerSprite.addChild(shaker);
 		shakerSprite.addEventListener(MouseEvent.CLICK, onShakerClick);
+		shakerSprite.buttonMode = true;
 		addChild(shakerSprite);
 		
 		var textFormat: TextFormat = new TextFormat("_sans", 15, 0xFFFFFF);
@@ -81,32 +89,38 @@ class Barman extends Sprite
 		addChild(result);
 		
 		vodka = new Bottle("vodka", new Bitmap(Assets.getBitmapData("img/vodka.png")));
-		vodka.scale = 0.5;
+		vodka.scale = 0.3;
 		vodka.y = 300;
 		vodka.x = 100;
 		vodka.addEventListener(MouseEvent.CLICK, onIngredientClick);
 		addChild(vodka);
 		
 		tomato = new Bottle("tomato", new Bitmap(Assets.getBitmapData("img/tomato.png")));
-		tomato.scale = 0.5;
-		tomato.x = tomato.y = 300;
+		tomato.scale = 0.3;
+		tomato.x = tomato.y = 315;
 		tomato.addEventListener(MouseEvent.CLICK, onIngredientClick);
 		addChild(tomato);
 		
-		var scoreFormat = new TextFormat(17, 0xFFFFFF, TextFormatAlign.CENTER);
+		var scoreFormat = new TextFormat(17, 0xFF0000, TextFormatAlign.LEFT);
+		
+		levelField.defaultTextFormat = scoreFormat;
+		levelField.selectable = levelField.mouseEnabled = false;
+		levelField.x = 60;
+		levelField.y = 35;
+		levelField.text = "Niveau 1";
+		addChild(levelField);
 		
 		scoreField.defaultTextFormat = scoreFormat;
 		scoreField.selectable = scoreField.mouseEnabled = false;
-		updateScore();
-		scoreField.width = Lib.current.stage.stageWidth;
-		scoreField.x = 0;
+		scoreField.x = levelField.x;
+		scoreField.y = levelField.y+ 30;
 		addChild(scoreField);
 		
 		timerField.defaultTextFormat = scoreFormat;
 		timerField.selectable = timerField.mouseEnabled = false;
 		updateTimer();
-		timerField.y = Lib.current.stage.stageHeight - timerField.height;
-		timerField.x = Lib.current.stage.stageWidth - timerField.width;
+		timerField.y = scoreField.y + 30;
+		timerField.x = scoreField.x;
 		addChild(timerField);
 		
 		startGame();
@@ -116,6 +130,7 @@ class Barman extends Sprite
 	{
 		startTime = Lib.getTimer();
 		objective = 500 * level;
+		updateScore();
 		addCommand();
 	}
 	
@@ -153,7 +168,7 @@ class Barman extends Sprite
 		
 		for (com in currentCommands) {
 			if (com.y > command.y) {
-				Actuate.tween(com, 0.9, { y: com.y-com.height-10 } );
+				Actuate.tween(com, 0.9, { y: com.y-com.height-10 }, false );
 			}
 		}
 		
@@ -162,13 +177,15 @@ class Barman extends Sprite
 	
 	private function initCookbook():Void 
 	{
-		var bloody: Cocktail = new Cocktail("Bloody Mary", Assets.getBitmapData("img/bloodymary.png"), [ "vodka", "tomato" ]);
-		var vodka: Cocktail = new Cocktail("Vodka", Assets.getBitmapData("img/bloodymary.png"), [ "vodka"]);
-		
-		cookbook.set("bloodymary", bloody);
-		pointScale.set("bloodymary", 500);
-		cookbook.set("vodka", vodka);
-		pointScale.set("vodka", 100);
+		switch(level){
+			case 1:	var bloody: Cocktail = new Cocktail("Bloody Mary", Assets.getBitmapData("img/bloodymary.png"), [ "vodka", "tomato" ]);
+					var vodka: Cocktail = new Cocktail("Vodka", Assets.getBitmapData("img/bloodymary.png"), [ "vodka"]);
+					cookbook.set("bloodymary", bloody);
+					pointScale.set("bloodymary", 500);
+					cookbook.set("vodka", vodka);
+					pointScale.set("vodka", 100);
+			//case 2:	var pina: Cocktail = new Cocktail("Pina Colada", Assets.
+		}
 	}
 	
 	private function addCommand() : Void 
@@ -195,7 +212,8 @@ class Barman extends Sprite
 	
 	private function updateScore() : Void 
 	{
-		scoreField.text = "Score: " + score;
+		scoreField.text = "Score: " + score + "/" + objective;
+		scoreField.width = scoreField.textWidth+10;
 	}
 	
 	private function updateTimer() : Void 
