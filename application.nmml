@@ -8,7 +8,7 @@
 	<!-- output -->
 	<app main="fr.florajb.mariage.Main" file="SpySkills" path="bin" />
 	
-	<window background="#000000" fps="60" />
+	<window background="#000000" fps="60" resizable="false" />
 	<window width="800" height="480" unless="mobile" />
 	<window orientation="landscape" vsync="true" antialiasing="0" if="cpp" />
 	

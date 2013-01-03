@@ -44,7 +44,7 @@ class Command extends Sprite
 		
 		var recipeName = new TextField();
 		recipeName.selectable = recipeName.mouseEnabled = false;
-		recipeName.defaultTextFormat = new TextFormat("_sans", 10);
+		recipeName.defaultTextFormat = new TextFormat("_sans", 10, true);
 		recipeName.text = nextRecipe.name;
 		recipeName.x = board.width / 2;
 		recipeName.y = board.height / 2 - 8;

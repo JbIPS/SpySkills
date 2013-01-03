@@ -26,12 +26,10 @@ class Barman extends Sprite
 	public static var pointScale: Hash<Int>;
 	
 	private var shaker: Bitmap;
-	private var vodka: Bottle;
-	private var tomato: Bottle;
 	private var result: TextField;
 	private var score: Int;
 	private var startTime: Int;
-	private var elapsedTime: Int;
+	private var remainingTime: Int;
 	private var lastCommandTime: Int;
 	private var level: Int;
 	private var objective: Int;
@@ -71,12 +69,16 @@ class Barman extends Sprite
 		var bkg = new Bitmap(Assets.getBitmapData("img/Background.png"));
 		addChild(bkg);
 		
-		shaker = new Bitmap(Assets.getBitmapData("img/shaker.png"));
-		shaker.scaleX = shaker.scaleY = 0.3;
-		shaker.x = 450;
-		shaker.y = 20;
 		var shakerSprite = new Sprite();
+		shakerSprite.x = 300;
+		shakerSprite.y = 25;
+		var plank = new Bitmap(Assets.getBitmapData("img/BluePlank.png"));
+		shakerSprite.addChild(plank);
+		shaker = new Bitmap(Assets.getBitmapData("img/shaker.png"));
+		shaker.x = 120;
+		shaker.scaleX = shaker.scaleY = 0.3;
 		shakerSprite.addChild(shaker);
+		
 		shakerSprite.addEventListener(MouseEvent.CLICK, onShakerClick);
 		shakerSprite.buttonMode = true;
 		addChild(shakerSprite);
@@ -88,26 +90,15 @@ class Barman extends Sprite
 		result.x = result.y = 200;
 		addChild(result);
 		
-		vodka = new Bottle("vodka", new Bitmap(Assets.getBitmapData("img/vodka.png")));
-		vodka.scale = 0.3;
-		vodka.y = 300;
-		vodka.x = 100;
-		vodka.addEventListener(MouseEvent.CLICK, onIngredientClick);
-		addChild(vodka);
+		createBottles();
 		
-		tomato = new Bottle("tomato", new Bitmap(Assets.getBitmapData("img/tomato.png")));
-		tomato.scale = 0.3;
-		tomato.x = tomato.y = 315;
-		tomato.addEventListener(MouseEvent.CLICK, onIngredientClick);
-		addChild(tomato);
-		
-		var scoreFormat = new TextFormat(17, 0xFF0000, TextFormatAlign.LEFT);
+		var scoreFormat = new TextFormat("_sans", 17, 0xFF0000, false);
 		
 		levelField.defaultTextFormat = scoreFormat;
 		levelField.selectable = levelField.mouseEnabled = false;
 		levelField.x = 60;
 		levelField.y = 35;
-		levelField.text = "Niveau 1";
+		levelField.text = "Niveau "+level;
 		addChild(levelField);
 		
 		scoreField.defaultTextFormat = scoreFormat;
@@ -155,6 +146,7 @@ class Barman extends Sprite
 		var points = new TextField();
 		var textFormat: TextFormat = new TextFormat("_sans", 15, 0xFFFFFF);
 		points.defaultTextFormat = textFormat;
+		points.selectable = points.mouseEnabled = false;
 		points.text = "+" + command.points + "Pts";
 		points.x = 250;
 		points.y = 100;
@@ -172,7 +164,7 @@ class Barman extends Sprite
 			}
 		}
 		
-		//addCommand();
+		addCommand();
 	}
 	
 	private function initCookbook():Void 
@@ -184,7 +176,9 @@ class Barman extends Sprite
 					pointScale.set("bloodymary", 500);
 					cookbook.set("vodka", vodka);
 					pointScale.set("vodka", 100);
-			//case 2:	var pina: Cocktail = new Cocktail("Pina Colada", Assets.
+			case 2:	var pina: Cocktail = new Cocktail("Pina Colada", null, [ "rhum", "ananas", "coco"]);
+					cookbook.set("pinacolada", pina);
+					pointScale.set("pinacolada", 1000);
 		}
 	}
 	
@@ -212,20 +206,22 @@ class Barman extends Sprite
 	
 	private function updateScore() : Void 
 	{
+		if (score >= objective)
+			scoreField.defaultTextFormat = new TextFormat("_sans", 17, 0x00FF00, true);
 		scoreField.text = "Score: " + score + "/" + objective;
 		scoreField.width = scoreField.textWidth+10;
 	}
 	
 	private function updateTimer() : Void 
 	{
-		timerField.text = Std.string(30 - elapsedTime) + "s";
+		timerField.text = remainingTime + "s";
 	}
 	
 	private function onEnterFrame(e: Event) : Void 
 	{
-		elapsedTime = Math.round((Lib.getTimer() - startTime) / 1000);
+		remainingTime = 30 - Math.round((Lib.getTimer() - startTime) / 1000);
 		updateTimer();
-		if (elapsedTime > 30) {
+		if (remainingTime <= 0) {
 			endLevel();
 		}
 		else if (Math.round((Lib.getTimer() - lastCommandTime)/1000) > 3) {
@@ -244,6 +240,8 @@ class Barman extends Sprite
 		
 		if (score >= objective) {
 			level++;
+			levelField.text = "Niveau "+level;
+			initCookbook();
 			addEventListener(MouseEvent.CLICK, init);
 		}
 		score = 0;
@@ -266,5 +264,32 @@ class Barman extends Sprite
 	{
 		while (!currentCommands.isEmpty())
 			currentCommands.pop();
+	}
+	
+	private function createBottles():Void 
+	{
+		var vodka = BottleFactory.createBottle("vodka");
+		vodka.setScale(0.3);
+		vodka.addEventListener(MouseEvent.CLICK, onIngredientClick);
+		addChild(vodka);
+		
+		var tomato = BottleFactory.createBottle("tomato");
+		tomato.setScale(0.3);
+		tomato.addEventListener(MouseEvent.CLICK, onIngredientClick);
+		addChild(tomato);
+		
+		if (level > 1) {
+			var rhum = BottleFactory.createBottle("rhum");
+			rhum.addEventListener(MouseEvent.CLICK, onIngredientClick);
+			addChild(rhum);
+			
+			var ananas = BottleFactory.createBottle("ananas");
+			ananas.addEventListener(MouseEvent.CLICK, onIngredientClick);
+			addChild(ananas);
+			
+			var coco = BottleFactory.createBottle("coco");
+			coco.addEventListener(MouseEvent.CLICK, onIngredientClick);
+			addChild(coco);
+		}
 	}
 }
