@@ -51,7 +51,7 @@ class Barman extends Sprite
 		scoreField = new TextField();
 		timerField = new TextField();
 		levelField = new TextField();
-		level = 1;
+		level = 2;
 		initCookbook();
 		
 		#if iphone
@@ -75,8 +75,9 @@ class Barman extends Sprite
 		var plank = new Bitmap(Assets.getBitmapData("img/BluePlank.png"));
 		shakerSprite.addChild(plank);
 		shaker = new Bitmap(Assets.getBitmapData("img/shaker.png"));
-		shaker.x = 120;
-		shaker.scaleX = shaker.scaleY = 0.3;
+		shaker.x = 160;
+		shaker.y = 10;
+		shaker.scaleX = shaker.scaleY = 0.85;
 		shakerSprite.addChild(shaker);
 		
 		shakerSprite.addEventListener(MouseEvent.CLICK, onShakerClick);
@@ -168,18 +169,8 @@ class Barman extends Sprite
 	}
 	
 	private function initCookbook():Void 
-	{
-		switch(level){
-			case 1:	var bloody: Cocktail = new Cocktail("Bloody Mary", Assets.getBitmapData("img/bloodymary.png"), [ "vodka", "tomato" ]);
-					var vodka: Cocktail = new Cocktail("Vodka", Assets.getBitmapData("img/bloodymary.png"), [ "vodka"]);
-					cookbook.set("bloodymary", bloody);
-					pointScale.set("bloodymary", 500);
-					cookbook.set("vodka", vodka);
-					pointScale.set("vodka", 100);
-			case 2:	var pina: Cocktail = new Cocktail("Pina Colada", null, [ "rhum", "ananas", "coco"]);
-					cookbook.set("pinacolada", pina);
-					pointScale.set("pinacolada", 1000);
-		}
+	{ 
+		Cookbook.instance.setLevel(level);
 	}
 	
 	private function addCommand() : Void 
@@ -273,19 +264,26 @@ class Barman extends Sprite
 		vodka.addEventListener(MouseEvent.CLICK, onIngredientClick);
 		addChild(vodka);
 		
-		var tomato = BottleFactory.createBottle("tomato");
-		tomato.setScale(0.3);
-		tomato.addEventListener(MouseEvent.CLICK, onIngredientClick);
-		addChild(tomato);
+		var orange = BottleFactory.createBottle("orange");
+		orange.addEventListener(MouseEvent.CLICK, onIngredientClick);
+		addChild(orange);
+		
+		var cola = BottleFactory.createBottle("cola");
+		cola.addEventListener(MouseEvent.CLICK, onIngredientClick);
+		addChild(cola);
+		
+		var vermouth = BottleFactory.createBottle("vermouth");
+		vermouth.addEventListener(MouseEvent.CLICK, onIngredientClick);
+		addChild(vermouth);
+			
+		var ananas = BottleFactory.createBottle("ananas");
+		ananas.addEventListener(MouseEvent.CLICK, onIngredientClick);
+		addChild(ananas);
 		
 		if (level > 1) {
 			var rhum = BottleFactory.createBottle("rhum");
 			rhum.addEventListener(MouseEvent.CLICK, onIngredientClick);
 			addChild(rhum);
-			
-			var ananas = BottleFactory.createBottle("ananas");
-			ananas.addEventListener(MouseEvent.CLICK, onIngredientClick);
-			addChild(ananas);
 			
 			var coco = BottleFactory.createBottle("coco");
 			coco.addEventListener(MouseEvent.CLICK, onIngredientClick);

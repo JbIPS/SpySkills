@@ -29,7 +29,7 @@ class Bottle extends SimpleButton
 	
 	private function onClick(e: MouseEvent) : Void 
 	{
-		Actuate.tween(this, 0.2, { rotation: 90 } ).repeat(1).reflect();
+		Actuate.tween(this, 0.2, { y: y-20 } ).repeat(1).reflect();
 	}
 	
 }

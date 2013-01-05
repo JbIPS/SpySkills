@@ -21,15 +21,19 @@ class BottleFactory
 	private static function setPosition(bottle: Bottle) 
 	{
 		switch(bottle.name){
-			case "vodka":	bottle.x = 100;
+			case "vermouth":bottle.x = 0;
 							bottle.y = 300;
-			case "tomato":	bottle.x = 315;
-							bottle.y = 315;
-			case "rhum":	bottle.x = 200;
+			case "vodka":	bottle.x = 130;
 							bottle.y = 300;
-			case "ananas":	bottle.x = 50;
+			case "cola":	bottle.x = 415;
+							bottle.y = 323;
+			case "orange":	bottle.x = 75;
 							bottle.y = 155;
-			case "coco":	bottle.x = 200;
+			case "rhum":	bottle.x = 85;
+							bottle.y = 300;
+			case "ananas":	bottle.x = 10;
+							bottle.y = 155;
+			case "coco":	bottle.x = 130;
 							bottle.y = 225;
 		}
 	}

@@ -12,12 +12,14 @@ class Cocktail
 	public var icon: BitmapData;
 	public var name: String;
 	public var recipe: Array<String>;
+	public var points: Int;
 	
-	public function new(name: String, icon: BitmapData, recipe: Array<String>) 
+	public function new(name: String, icon: BitmapData, recipe: Array<String>, points: Int) 
 	{
 		this.name = name;
 		this.icon = icon;
 		this.recipe = recipe;
+		this.points = points;
 	}
 	
 	public function equalsRecipe(recipe: Array<String>) : Bool

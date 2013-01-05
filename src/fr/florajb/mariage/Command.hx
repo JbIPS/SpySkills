@@ -25,20 +25,21 @@ class Command extends Sprite
 		
 		var nextRecipe: Cocktail = null;
 		var bestScore: Float = 0;
-		for (icon in Barman.cookbook.keys()) {
+		var list = Cookbook.instance.recipes;
+		for (recipe in list) {
 			var score = Math.random();
 			if (score > bestScore) {
 				bestScore = score;
-				nextRecipe = Barman.cookbook.get(icon);
+				nextRecipe = recipe;
 			}
 		}
 		
 		cocktail = nextRecipe;
-		points = Barman.pointScale.get(StringTools.replace(cocktail.name.toLowerCase(), " ", ""));
-		Lib.trace("next recipe: " + nextRecipe.name);
+		points = cocktail.points;
+		Lib.trace("next recipe: " + cocktail.name);
 		
-		var icon: Bitmap = new Bitmap(nextRecipe.icon);
-		icon.scaleX = icon.scaleY = 0.3;
+		var icon: Bitmap = new Bitmap(cocktail.icon);
+		icon.scaleX = icon.scaleY = 0.6;
 		icon.x = icon.y = 10;
 		addChild(icon);
 		
