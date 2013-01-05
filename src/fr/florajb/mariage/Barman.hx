@@ -33,6 +33,7 @@ class Barman extends Sprite
 	private var lastCommandTime: Int;
 	private var level: Int;
 	private var objective: Int;
+	private var maxCommand: Int = 1;
 	private var scoreField: TextField;
 	private var timerField: TextField;
 	private var levelField: TextField;
@@ -91,7 +92,7 @@ class Barman extends Sprite
 		result.x = result.y = 200;
 		addChild(result);
 		
-		createBottles();
+		initLevel();
 		
 		var scoreFormat = new TextFormat("_sans", 17, 0xFF0000, false);
 		
@@ -216,7 +217,7 @@ class Barman extends Sprite
 			endLevel();
 		}
 		else if (Math.round((Lib.getTimer() - lastCommandTime)/1000) > 3) {
-			if(currentCommands.length < level)
+			if(currentCommands.length < maxCommand)
 				addCommand();
 		}
 	}
@@ -257,37 +258,42 @@ class Barman extends Sprite
 			currentCommands.pop();
 	}
 	
-	private function createBottles():Void 
+	private function initLevel():Void 
 	{
 		var vodka = BottleFactory.createBottle("vodka");
 		vodka.setScale(0.3);
 		vodka.addEventListener(MouseEvent.CLICK, onIngredientClick);
 		addChild(vodka);
 		
-		var orange = BottleFactory.createBottle("orange");
-		orange.addEventListener(MouseEvent.CLICK, onIngredientClick);
-		addChild(orange);
-		
-		var cola = BottleFactory.createBottle("cola");
-		cola.addEventListener(MouseEvent.CLICK, onIngredientClick);
-		addChild(cola);
-		
-		var vermouth = BottleFactory.createBottle("vermouth");
-		vermouth.addEventListener(MouseEvent.CLICK, onIngredientClick);
-		addChild(vermouth);
-			
-		var ananas = BottleFactory.createBottle("ananas");
-		ananas.addEventListener(MouseEvent.CLICK, onIngredientClick);
-		addChild(ananas);
+		createIngredient("orange");
+		createIngredient("cola");
+		createIngredient("vermouth");
+		createIngredient("ananas");
 		
 		if (level > 1) {
-			var rhum = BottleFactory.createBottle("rhum");
-			rhum.addEventListener(MouseEvent.CLICK, onIngredientClick);
-			addChild(rhum);
-			
-			var coco = BottleFactory.createBottle("coco");
-			coco.addEventListener(MouseEvent.CLICK, onIngredientClick);
-			addChild(coco);
+			createIngredient("rhum");
+			createIngredient("citron");
+			createIngredient("sucre");
 		}
+		if(level > 2){
+			maxCommand++;
+			createIngredient("coco");
+			createIngredient("tequila");
+			createIngredient("grenadine");
+		}
+		if(level > 3){
+			createIngredient("gin");
+			createIngredient("triplesec");
+		}
+		if(level > 4)
+			maxCommand++;
+		if(level > 6)
+			createIngredient("menthe");
+	}
+	
+	private function createIngredient(name: String){
+		var ingredient = BottleFactory.createBottle(name);
+		ingredient.addEventListener(MouseEvent.CLICK, onIngredientClick);
+		addChild(ingredient);
 	}
 }

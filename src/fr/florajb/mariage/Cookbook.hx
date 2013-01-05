@@ -25,7 +25,17 @@ class Cookbook
 					recipes.add(new Cocktail("Cola", Assets.getBitmapData("img/cola.png"), [ "cola"], 50));
 					recipes.add(new Cocktail("Vodka Martini", null, [ "vodka", "vermouth"], 100));
 					recipes.add(new Cocktail("Screwdriver", null, [ "vodka", "orange"], 100));
-			case 2:	recipes.add(new Cocktail("Pina Colada", null, [ "rhum", "ananas", "coco"], 150));
+			case 2:	recipes.add(new Cocktail("Daiquiri", null, [ "rhum", "sucre", "citron"], 150));
+					recipes.add(new Cocktail("Cuba Libre", null, [ "rhum", "cola"], 100));
+			case 3: recipes.add(new Cocktail("Piña Colada", null, [ "rhum", "ananas", "coco"], 150));
+					recipes.add(new Cocktail("Tequila Sunrise", null, [ "tequila", "orange", "grenadine"], 150));
+			case 4: recipes.add(new Cocktail("Margarita", null, [ "tequila", "triplesec", "citron"], 150));
+					recipes.add(new Cocktail("Bronx", null, [ "gin", "vermouth", "orange"], 150));
+			case 6: recipes.add(new Cocktail("Gin Fizz", null, [ "gin", "sucre", "citron", "eau"], 200));
+			case 7: recipes.add(new Cocktail("Mojito", null, [ "rhum", "sucre", "menthe", "citron", "eau"], 250));
+			case 8: recipes.add(new Cocktail("Sex on the Beach", null, [ "vodka", "triplesec", "citron", "ananas", "grenadine"], 250));
+			case 9: recipes.add(new Cocktail("Coco Loco", null, [ "tequila", "gin", "rhum", "ananas", "citron", "sucre", "coco"], 500));
+			case 10: recipes.add(new Cocktail("Long Island Iced Tea", null, [ "tequila", "gin", "rhum", "vodka", "triplesec", "citron", "sucre", "cola"], 600));
 		}
 	}
 	
@@ -33,56 +43,3 @@ class Cookbook
 		recipes = new FastList<Cocktail>();		
 	}	
 }
-
-/*3. Cola = Cola
-4. Vodka Martini = Vodka + Vermouth
-5. Screwdriver = Vodka + Orange
-6. Daiquiri = Rhum + Sucre + Citron
-7. Cuba Libre = Rhum + Cola
-8. Piña Colada = Rhum + Ananas + Coco
-9. Tequila Sunrise = Tequila + Orange + Grenadine
-10. Margarita = Tequila+ Triple sec + Citron
-11. Bronx = Gin + Vermouth + Orange
-12. Gin Fizz = Gin + Sucre + Citron + Eau gazeuse
-13. Mojito = Rhum + Sucre + Menthe + Citron + Eau gazeuse
-14. Sex on the Beach = Vodka + Triple sec + Citron + Ananas + Grenadine
-15. Coco Loco = Tequila + Gin + Rhum + Ananas + Citron + Sucre + Coco
-16. Long Island Iced Tea = Tequila + Gin + Rhum + Vodka + Triple sec + Cola + Sucre + Citron
-
-Niveaux
-Niveau 1
-• 1 Planche
-• Ingrédients :
-o Ananas
-o Orange
-Jus d’orange
-Jus d’ananas
-Cola
-Vodka Martini
-Screwdriver
-
-o
-o
-o
-o
-o
-
-Niveau 2
-• 2 Planches
-• Ingrédients supplémentaires :
-o Rhum
-o Citron
-o Sucre
-• Cocktails appris :
-o Daiquiri
-o Cuba Libre
-
-Niveau 3
-• 2 Planches
-• Ingrédients supplémentaires :
-o Coco
-o Tequila
-o Grenadine
-• Cocktails appris :
-o Piña Colada
-o Tequila Sunrise*/
