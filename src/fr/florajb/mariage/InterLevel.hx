@@ -85,7 +85,7 @@ class InterLevel extends Sprite
 	
 	private function onAdd(e:Event):Void 
 	{
-		Timer.delay(activateButton, 2000);
+		Timer.delay(activateButton, 500);
 	}
 	
 	private function activateButton() 

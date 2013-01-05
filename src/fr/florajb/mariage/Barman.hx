@@ -86,8 +86,6 @@ class Barman extends Sprite
 		shakerSprite.buttonMode = true;
 		addChild(shakerSprite);
 		
-		initLevel();
-		
 		var scoreFormat = new TextFormat("_sans", 17, 0xFF0000, false);
 		
 		levelField.defaultTextFormat = scoreFormat;
@@ -135,6 +133,9 @@ class Barman extends Sprite
 		startTime = Lib.getTimer();
 		objective = 500 * level;
 		updateScore();
+		
+		initLevel();
+		
 		addCommand();
 	}
 	
@@ -193,7 +194,7 @@ class Barman extends Sprite
 		command.x = Lib.current.stage.stageWidth;
 		command.y = 50 + (numCommand*command.height + 10);
 		currentCommands.add(command);
-		Actuate.tween(command, 0.9, { x: Lib.current.stage.stageWidth - command.width } ).ease(Cubic.easeOut).delay(0.1);
+		Actuate.tween(command, 0.9, { x: Lib.current.stage.stageWidth - command.width + 5 } ).ease(Cubic.easeOut).delay(0.1);
 		addChild(command);
 	}
 	
@@ -214,7 +215,9 @@ class Barman extends Sprite
 	private function updateScore() : Void 
 	{
 		if (score >= objective)
-			scoreField.defaultTextFormat = new TextFormat("_sans", 17, 0x00FF00, true);
+			scoreField.defaultTextFormat.color = 0x00FF00;
+		else
+			scoreField.defaultTextFormat.color = 0xFF0000;
 		scoreField.text = "Score: " + score + "/" + objective;
 		scoreField.width = scoreField.textWidth+10;
 	}
@@ -280,39 +283,33 @@ class Barman extends Sprite
 	private function clearCommands():Void 
 	{
 		while (!currentCommands.isEmpty())
-			currentCommands.pop();
+			removeChild(currentCommands.pop());
 	}
 	
 	private function initLevel():Void 
 	{
-		createIngredient("vodka");
-		createIngredient("orange");
-		createIngredient("cola");
-		createIngredient("vermouth");
-		createIngredient("ananas");
-		
-		if (level > 1) {
-			maxCommand++;
-			createIngredient("rhum");
-			createIngredient("citron");
-			createIngredient("sucre");
+		switch(level){
+			case 1:	createIngredient("vodka");
+					createIngredient("orange");
+					createIngredient("cola");
+					createIngredient("vermouth");
+					createIngredient("ananas");
+			case 2:	maxCommand++;
+					createIngredient("rhum");
+					createIngredient("citron");
+					createIngredient("sucre");
+			case 3:	createIngredient("coco");
+					createIngredient("tequila");
+					createIngredient("grenadine");
+			case 4:	createIngredient("gin");
+					createIngredient("triplesec");
+			case 5:	maxCommand++;
+			case 7:	createIngredient("menthe");
 		}
-		if(level > 2){
-			createIngredient("coco");
-			createIngredient("tequila");
-			createIngredient("grenadine");
-		}
-		if(level > 3){
-			createIngredient("gin");
-			createIngredient("triplesec");
-		}
-		if(level > 4)
-			maxCommand++;
-		if(level > 6)
-			createIngredient("menthe");
 	}
 	
-	private function createIngredient(name: String){
+	private function createIngredient(name: String)
+	{
 		var ingredient = BottleFactory.createBottle(name);
 		ingredient.addEventListener(MouseEvent.CLICK, onIngredientClick);
 		addChild(ingredient);
@@ -333,10 +330,12 @@ class Barman extends Sprite
 		if (pause) {
 			pauseTime = Lib.getTimer();
 			removeEventListener(Event.DEACTIVATE, onSpace);
+			addEventListener(Event.ACTIVATE, onSpace);
 		}
 		else {
 			startTime += Lib.getTimer() - pauseTime;
 			addEventListener(Event.DEACTIVATE, onSpace);
+			removeEventListener(Event.ACTIVATE, onSpace);
 		}
 	}
 }

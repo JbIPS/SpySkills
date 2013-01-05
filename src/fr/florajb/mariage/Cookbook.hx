@@ -28,7 +28,7 @@ class Cookbook
 			case 2:	recipes.add(new Cocktail("Daiquiri", null, [ "rhum", "sucre", "citron"], 150));
 					recipes.add(new Cocktail("Cuba Libre", null, [ "rhum", "cola"], 100));
 			case 3: recipes.add(new Cocktail("Piña Colada", null, [ "rhum", "ananas", "coco"], 150));
-					recipes.add(new Cocktail("Tequila Sunrise", null, [ "tequila", "orange", "grenadine"], 150));
+					recipes.add(new Cocktail("Tequila \nSunrise", null, [ "tequila", "orange", "grenadine"], 150));
 			case 4: recipes.add(new Cocktail("Margarita", null, [ "tequila", "triplesec", "citron"], 150));
 					recipes.add(new Cocktail("Bronx", null, [ "gin", "vermouth", "orange"], 150));
 			case 6: recipes.add(new Cocktail("Gin Fizz", null, [ "gin", "sucre", "citron", "eau"], 200));

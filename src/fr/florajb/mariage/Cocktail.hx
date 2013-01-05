@@ -25,6 +25,8 @@ class Cocktail
 	public function equalsRecipe(recipe: Array<String>) : Bool
 	{
 		var equals = true;
+		if (this.recipe.length != recipe.length)
+			return false;
 		this.recipe.sort(sort);
 		recipe.sort(sort);
 		var i = 0;
