@@ -141,8 +141,8 @@ class Barman extends Sprite
 		points.defaultTextFormat = textFormat;
 		points.selectable = points.mouseEnabled = false;
 		points.text = "+" + command.points + "Pts";
-		points.x = 250;
-		points.y = 100;
+		points.x = 350;
+		points.y = 80;
 		Actuate.tween(points, 3, { y: 50, alpha: 0 } );
 		addChild(points);
 		
@@ -180,7 +180,6 @@ class Barman extends Sprite
 	private function onIngredientClick(e: MouseEvent) : Void 
 	{
 		var ingredient = cast(e.target, Bottle);
-		Lib.trace(ingredient.name+" is used: "+ingredient.used);
 		if(ingredient.used){
 			ingredients.remove(ingredient);
 			ingredient.used = false;
@@ -230,10 +229,19 @@ class Barman extends Sprite
 			level++;
 			levelField.text = "Niveau "+level;
 			initCookbook();
+			#if flash
 			addEventListener(MouseEvent.CLICK, init);
+			#else
+			haxe.Timer.delay(initProxy, 1000);
+			#end
 		}
 		score = 0;
 		
+	}
+	
+	private function initProxy() : Void
+	{
+		init(null);
 	}
 	
 	private function clearStage() : Void 
@@ -258,23 +266,19 @@ class Barman extends Sprite
 	
 	private function initLevel():Void 
 	{
-		var vodka = BottleFactory.createBottle("vodka");
-		vodka.setScale(0.3);
-		vodka.addEventListener(MouseEvent.CLICK, onIngredientClick);
-		addChild(vodka);
-		
+		createIngredient("vodka");
 		createIngredient("orange");
 		createIngredient("cola");
 		createIngredient("vermouth");
 		createIngredient("ananas");
 		
 		if (level > 1) {
+			maxCommand++;
 			createIngredient("rhum");
 			createIngredient("citron");
 			createIngredient("sucre");
 		}
 		if(level > 2){
-			maxCommand++;
 			createIngredient("coco");
 			createIngredient("tequila");
 			createIngredient("grenadine");

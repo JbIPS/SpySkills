@@ -29,7 +29,6 @@ class Bottle extends SimpleButton
 	
 	public function setUsed(use: Bool) : Bool
 	{
-		nme.Lib.trace(name+" is set to: "+use);
 		used = use;
 		if(use)
 			Actuate.tween(this, 0.2, { y: y-20 } );

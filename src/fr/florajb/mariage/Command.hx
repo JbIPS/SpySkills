@@ -36,7 +36,6 @@ class Command extends Sprite
 		
 		cocktail = nextRecipe;
 		points = cocktail.points;
-		Lib.trace("next recipe: " + cocktail.name);
 		
 		var icon: Bitmap = new Bitmap(cocktail.icon);
 		icon.scaleX = icon.scaleY = 0.6;
@@ -45,7 +44,7 @@ class Command extends Sprite
 		
 		var recipeName = new TextField();
 		recipeName.selectable = recipeName.mouseEnabled = false;
-		recipeName.defaultTextFormat = new TextFormat("_sans", 10, true);
+		recipeName.defaultTextFormat = new TextFormat("_sans", 11, true);
 		recipeName.text = nextRecipe.name;
 		recipeName.x = board.width / 2;
 		recipeName.y = board.height / 2 - 8;
