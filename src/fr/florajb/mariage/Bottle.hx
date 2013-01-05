@@ -12,12 +12,12 @@ import nme.events.MouseEvent;
 class Bottle extends SimpleButton
 {
 	public var scale (default, setScale): Float;
+	public var used (default, setUsed): Bool = false;
 	
 	public function new(name: String, ?icon: DisplayObject) 
 	{
 		super(icon, icon, icon, icon);
 		this.name = name;
-		addEventListener(MouseEvent.CLICK, onClick);
 	}
 	
 	public function setScale(scale: Float) : Float 
@@ -27,9 +27,15 @@ class Bottle extends SimpleButton
 		return scale;
 	}
 	
-	private function onClick(e: MouseEvent) : Void 
+	public function setUsed(use: Bool) : Bool
 	{
-		Actuate.tween(this, 0.2, { y: y-20 } ).repeat(1).reflect();
-	}
-	
+		nme.Lib.trace(name+" is set to: "+use);
+		used = use;
+		if(use)
+			Actuate.tween(this, 0.2, { y: y-20 } );
+		else
+			Actuate.tween(this, 0.2, { y: y+20 } );
+			
+		return used;
+	}	
 }

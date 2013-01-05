@@ -26,7 +26,6 @@ class Barman extends Sprite
 	public static var pointScale: Hash<Int>;
 	
 	private var shaker: Bitmap;
-	private var result: TextField;
 	private var score: Int;
 	private var startTime: Int;
 	private var remainingTime: Int;
@@ -38,21 +37,21 @@ class Barman extends Sprite
 	private var timerField: TextField;
 	private var levelField: TextField;
 	
-	private var ingredients: Array<String>;
+	private var ingredients: Array<Bottle>;
 	private var currentCommands: List<Command>;
 	
 	
 	public function new() 
 	{
 		super();
-		ingredients = new Array<String>();
+		ingredients = new Array<Bottle>();
 		cookbook = new Hash<Cocktail>();
 		currentCommands = new List<Command>();
 		pointScale = new Hash<Int>();
 		scoreField = new TextField();
 		timerField = new TextField();
 		levelField = new TextField();
-		level = 2;
+		level = 1;
 		initCookbook();
 		
 		#if iphone
@@ -84,13 +83,6 @@ class Barman extends Sprite
 		shakerSprite.addEventListener(MouseEvent.CLICK, onShakerClick);
 		shakerSprite.buttonMode = true;
 		addChild(shakerSprite);
-		
-		var textFormat: TextFormat = new TextFormat("_sans", 15, 0xFFFFFF);
-		result = new TextField();
-		result.selectable = result.mouseEnabled = false;
-		result.defaultTextFormat = textFormat;
-		result.x = result.y = 200;
-		addChild(result);
 		
 		initLevel();
 		
@@ -132,14 +124,13 @@ class Barman extends Sprite
 		Actuate.tween(shaker, 0.05, { x: shaker.x + 10, y: shaker.y - 10 } ).repeat(5).reflect();
 		
 		for (command in currentCommands) {
-			if (command.cocktail.equalsRecipe(ingredients)) {
+			if (command.cocktail.equalsRecipe(bottleToString(ingredients))) {
 				currentCommands.remove(command);
 				validateCommand(command);
 				break;
 			}
 		}
 		
-		result.text = "";
 		clearIngredients();
 	}
 	
@@ -188,11 +179,16 @@ class Barman extends Sprite
 	
 	private function onIngredientClick(e: MouseEvent) : Void 
 	{
-		var ingredient = cast(e.target, Bottle).name;
-		if(!ArrayTools.contains(ingredients, ingredient))
+		var ingredient = cast(e.target, Bottle);
+		Lib.trace(ingredient.name+" is used: "+ingredient.used);
+		if(ingredient.used){
+			ingredients.remove(ingredient);
+			ingredient.used = false;
+		}
+		else{
 			ingredients.push(ingredient);
-		result.text = ingredients.join(" + ");
-		result.width = result.textWidth+10;
+			ingredient.used = true;
+		}
 		
 	}
 	
@@ -248,8 +244,10 @@ class Barman extends Sprite
 	
 	private function clearIngredients():Void 
 	{
-		while (ingredients.length != 0)
-			ingredients.pop();
+		while (ingredients.length != 0){
+			var ingredient = ingredients.pop();
+			ingredient.used = false;
+		}
 	}
 	
 	private function clearCommands():Void 
@@ -295,5 +293,14 @@ class Barman extends Sprite
 		var ingredient = BottleFactory.createBottle(name);
 		ingredient.addEventListener(MouseEvent.CLICK, onIngredientClick);
 		addChild(ingredient);
+	}
+	
+	private function bottleToString(array: Array<Bottle>) : Array<String>
+	{
+		var stringArray = new Array<String>();
+		for(bottle in array)
+			stringArray.push(bottle.name);
+		
+		return stringArray;
 	}
 }
