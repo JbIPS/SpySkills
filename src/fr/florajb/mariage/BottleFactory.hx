@@ -35,6 +35,10 @@ class BottleFactory
 							bottle.y = 155;
 			case "coco":	bottle.x = 130;
 							bottle.y = 225;
+			case "sucre":	bottle.x = 500;
+							bottle.y = 290;
+			case "citron":	bottle.x = 250;
+							bottle.y = 235;
 		}
 	}
 	

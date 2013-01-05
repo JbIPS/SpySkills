@@ -9,11 +9,13 @@ import nme.display.BitmapData;
 import nme.display.SimpleButton;
 import nme.display.Sprite;
 import nme.events.Event;
+import nme.events.KeyboardEvent;
 import nme.events.MouseEvent;
 import nme.Lib;
 import nme.text.TextField;
 import nme.text.TextFormat;
 import nme.text.TextFormatAlign;
+import nme.ui.Keyboard;
 
 /**
  * ...
@@ -21,37 +23,33 @@ import nme.text.TextFormatAlign;
  */
 
 class Barman extends Sprite 
-{
-	public static var cookbook: Hash<Cocktail>;
-	public static var pointScale: Hash<Int>;
-	
+{	
 	private var shaker: Bitmap;
 	private var score: Int;
 	private var startTime: Int;
 	private var remainingTime: Int;
 	private var lastCommandTime: Int;
-	private var level: Int;
+	private var level: Int = 1;
 	private var objective: Int;
 	private var maxCommand: Int = 1;
 	private var scoreField: TextField;
 	private var timerField: TextField;
 	private var levelField: TextField;
+	private var paused: Bool = false;
+	private var pauseTime: Int;
 	
 	private var ingredients: Array<Bottle>;
 	private var currentCommands: List<Command>;
 	
-	
+	private var event:Event;
 	public function new() 
 	{
 		super();
 		ingredients = new Array<Bottle>();
-		cookbook = new Hash<Cocktail>();
 		currentCommands = new List<Command>();
-		pointScale = new Hash<Int>();
 		scoreField = new TextField();
 		timerField = new TextField();
 		levelField = new TextField();
-		level = 1;
 		initCookbook();
 		
 		#if iphone
@@ -60,6 +58,10 @@ class Barman extends Sprite
 		addEventListener(Event.ADDED_TO_STAGE, init);
 		#end
 		addEventListener(Event.ENTER_FRAME, onEnterFrame);
+		addEventListener(Event.DEACTIVATE, onSpace);
+		addEventListener(Event.ACTIVATE, onSpace);
+		addEventListener(MouseEvent.CLICK, cheat);
+		InterLevel.instance.startMethod = startProxy;
 	}
 
 	private function init(e: Event) 
@@ -108,11 +110,28 @@ class Barman extends Sprite
 		timerField.x = scoreField.x;
 		addChild(timerField);
 		
-		startGame();
+		startLevel();
 	}
 	
-	private function startGame() : Void 
+	private function cheat(e:MouseEvent):Void 
 	{
+		if(e.altKey){
+			score = objective;
+			updateScore();
+			endLevel();
+		}
+	}
+	
+	private function onSpace(e:Event) : Void 
+	{
+		setPause(!paused);
+	}
+	
+	private function startLevel() : Void 
+	{
+		if(level > 1)
+			removeChild(InterLevel.instance);
+		setPause(false);
 		startTime = Lib.getTimer();
 		objective = 500 * level;
 		updateScore();
@@ -157,7 +176,8 @@ class Barman extends Sprite
 			}
 		}
 		
-		addCommand();
+		if(currentCommands.isEmpty())
+			addCommand();
 	}
 	
 	private function initCookbook():Void 
@@ -206,6 +226,9 @@ class Barman extends Sprite
 	
 	private function onEnterFrame(e: Event) : Void 
 	{
+		if (paused)
+			return;
+			
 		remainingTime = 30 - Math.round((Lib.getTimer() - startTime) / 1000);
 		updateTimer();
 		if (remainingTime <= 0) {
@@ -219,29 +242,25 @@ class Barman extends Sprite
 	
 	private function endLevel() : Void 
 	{
-		clearStage();
+		setPause(true);
+		
+		InterLevel.instance.score = score;
+		addChild(InterLevel.instance);
 		clearCommands();
 		clearIngredients();
-		scoreField.y = Lib.current.stage.stageHeight / 2;
-		addChild(scoreField);
 		
 		if (score >= objective) {
 			level++;
 			levelField.text = "Niveau "+level;
 			initCookbook();
-			#if flash
-			addEventListener(MouseEvent.CLICK, init);
-			#else
-			haxe.Timer.delay(initProxy, 1000);
-			#end
 		}
 		score = 0;
 		
 	}
 	
-	private function initProxy() : Void
+	private function startProxy(e:MouseEvent) : Void
 	{
-		init(null);
+		startLevel();
 	}
 	
 	private function clearStage() : Void 
@@ -306,5 +325,18 @@ class Barman extends Sprite
 			stringArray.push(bottle.name);
 		
 		return stringArray;
+	}
+	
+	private function setPause(pause: Bool) : Void 
+	{
+		paused = pause;
+		if (pause) {
+			pauseTime = Lib.getTimer();
+			removeEventListener(Event.DEACTIVATE, onSpace);
+		}
+		else {
+			startTime += Lib.getTimer() - pauseTime;
+			addEventListener(Event.DEACTIVATE, onSpace);
+		}
 	}
 }

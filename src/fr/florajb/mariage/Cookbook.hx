@@ -33,9 +33,9 @@ class Cookbook
 					recipes.add(new Cocktail("Bronx", null, [ "gin", "vermouth", "orange"], 150));
 			case 6: recipes.add(new Cocktail("Gin Fizz", null, [ "gin", "sucre", "citron", "eau"], 200));
 			case 7: recipes.add(new Cocktail("Mojito", null, [ "rhum", "sucre", "menthe", "citron", "eau"], 250));
-			case 8: recipes.add(new Cocktail("Sex on the Beach", null, [ "vodka", "triplesec", "citron", "ananas", "grenadine"], 250));
+			case 8: recipes.add(new Cocktail("Sex on the \nBeach", null, [ "vodka", "triplesec", "citron", "ananas", "grenadine"], 250));
 			case 9: recipes.add(new Cocktail("Coco Loco", null, [ "tequila", "gin", "rhum", "ananas", "citron", "sucre", "coco"], 500));
-			case 10: recipes.add(new Cocktail("Long Island Iced Tea", null, [ "tequila", "gin", "rhum", "vodka", "triplesec", "citron", "sucre", "cola"], 600));
+			case 10: recipes.add(new Cocktail("Long Island \nIced Tea", null, [ "tequila", "gin", "rhum", "vodka", "triplesec", "citron", "sucre", "cola"], 600));
 		}
 	}
 	

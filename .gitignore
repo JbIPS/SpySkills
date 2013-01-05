@@ -1,4 +1,7 @@
 assets/img/._*.png
+bin/.build
 bin/cpp
+bin/android
 bin/flash/haxe
 assets/img/Thumbs.db
+SpySkills.*
