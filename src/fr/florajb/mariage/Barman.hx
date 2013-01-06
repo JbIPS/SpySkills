@@ -12,6 +12,8 @@ import nme.events.Event;
 import nme.events.KeyboardEvent;
 import nme.events.MouseEvent;
 import nme.Lib;
+import nme.media.SoundChannel;
+import nme.media.SoundTransform;
 import nme.text.TextField;
 import nme.text.TextFormat;
 import nme.text.TextFormatAlign;
@@ -40,6 +42,7 @@ class Barman extends Sprite
 	
 	private var ingredients: Array<Bottle>;
 	private var currentCommands: List<Command>;
+	private var soundChannel: SoundChannel;
 	
 	private var event:Event;
 	public function new() 
@@ -95,7 +98,6 @@ class Barman extends Sprite
 		levelField.text = "Niveau "+level;
 		addChild(levelField);
 		
-		scoreField.defaultTextFormat = scoreFormat;
 		scoreField.selectable = scoreField.mouseEnabled = false;
 		scoreField.x = levelField.x;
 		scoreField.y = levelField.y+ 30;
@@ -132,9 +134,15 @@ class Barman extends Sprite
 		setPause(false);
 		startTime = Lib.getTimer();
 		objective = 500 * level;
+		
+		scoreField.defaultTextFormat = new TextFormat("_sans", 17, 0xFF0000, false);
 		updateScore();
 		
 		initLevel();
+		var loop = Assets.getSound("sfx/loop.mp3");
+		soundChannel = loop.play();
+		var soundTransform = new SoundTransform(0.15);
+		soundChannel.soundTransform = soundTransform;
 		
 		addCommand();
 	}
@@ -150,7 +158,7 @@ class Barman extends Sprite
 				break;
 			}
 		}
-		
+		Assets.getSound("sfx/shaker.mp3").play();
 		clearIngredients();
 	}
 	
@@ -214,10 +222,9 @@ class Barman extends Sprite
 	
 	private function updateScore() : Void 
 	{
-		if (score >= objective)
-			scoreField.defaultTextFormat.color = 0x00FF00;
-		else
-			scoreField.defaultTextFormat.color = 0xFF0000;
+		if (score >= objective){
+			scoreField.defaultTextFormat = new TextFormat("_sans", 17, 0x00FF00, true);
+		}
 		scoreField.text = "Score: " + score + "/" + objective;
 		scoreField.width = scoreField.textWidth+10;
 	}
@@ -232,7 +239,7 @@ class Barman extends Sprite
 		if (paused)
 			return;
 			
-		remainingTime = 30 - Math.round((Lib.getTimer() - startTime) / 1000);
+		remainingTime = 90 - Math.round((Lib.getTimer() - startTime) / 1000);
 		updateTimer();
 		if (remainingTime <= 0) {
 			endLevel();
@@ -246,7 +253,7 @@ class Barman extends Sprite
 	private function endLevel() : Void 
 	{
 		setPause(true);
-		
+		soundChannel.stop();
 		InterLevel.instance.score = score;
 		addChild(InterLevel.instance);
 		clearCommands();
@@ -287,7 +294,7 @@ class Barman extends Sprite
 	}
 	
 	private function initLevel():Void 
-	{
+	{		
 		switch(level){
 			case 1:	createIngredient("vodka");
 					createIngredient("orange");

@@ -8,6 +8,7 @@ import nme.display.Sprite;
 import nme.events.Event;
 import nme.events.MouseEvent;
 import nme.Lib;
+import nme.media.SoundChannel;
 import nme.text.TextField;
 import nme.text.TextFieldAutoSize;
 import nme.text.TextFormat;
@@ -26,6 +27,7 @@ class InterLevel extends Sprite
 	
 	private var continueButton: SimpleButton;
 	private var scoreField: TextField;
+	private var soundChannel: SoundChannel;
 	
 	static public function getInstance() 
 	{
@@ -79,12 +81,17 @@ class InterLevel extends Sprite
 	
 	private function onRemove(e:Event):Void 
 	{
+		soundChannel.stop();
 		continueButton.enabled = continueButton.useHandCursor = false;
 		continueButton.removeEventListener(MouseEvent.CLICK, startMethod);
 	}
 	
 	private function onAdd(e:Event):Void 
 	{
+		var loop = Assets.getSound("sfx/interlevel.mp3");
+		soundChannel = loop.play();
+		var soundTransform = new SoundTransform(0.25);
+		soundChannel.soundTransform = soundTransform;
 		Timer.delay(activateButton, 500);
 	}
 	
