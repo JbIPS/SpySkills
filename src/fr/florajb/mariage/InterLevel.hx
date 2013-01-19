@@ -9,6 +9,7 @@ import nme.events.Event;
 import nme.events.MouseEvent;
 import nme.Lib;
 import nme.media.SoundChannel;
+import nme.media.SoundTransform;
 import nme.text.TextField;
 import nme.text.TextFieldAutoSize;
 import nme.text.TextFormat;
@@ -25,7 +26,9 @@ class InterLevel extends Sprite
 	public var score (default, setScore): Int;
 	public var startMethod: Dynamic -> Void;
 	
+	private var totalScore: Int = 0;
 	private var continueButton: SimpleButton;
+	private var totalScoreField: TextField;
 	private var scoreField: TextField;
 	private var soundChannel: SoundChannel;
 	
@@ -39,7 +42,9 @@ class InterLevel extends Sprite
 	public function setScore(score: Int) : Int 
 	{
 		this.score = score;
-		scoreField.text = score + "pts";
+		scoreField.text = "Level: "+score + "pts";
+		totalScore += score;
+		totalScoreField.text ="Total: "+ totalScore + "pts";
 		return score;
 	}
 	
@@ -59,7 +64,7 @@ class InterLevel extends Sprite
 		
 		var continueField = new TextField();
 		continueField.defaultTextFormat = new TextFormat("_sans", 22, 0xFFFF00, true);
-		continueField.x = 380;
+		continueField.x = 310;
 		continueField.y = 85;
 		continueField.selectable = continueField.mouseEnabled = false;
 		continueField.text = "CONTINUE";
@@ -69,11 +74,21 @@ class InterLevel extends Sprite
 		scoreField = new TextField();
 		scoreField.defaultTextFormat = new TextFormat("_sans", 22, 0x00FF00, true);
 		scoreField.selectable = scoreField.mouseEnabled = false;
+		
+		totalScoreField = new TextField();
+		totalScoreField.defaultTextFormat = new TextFormat("_sans", 22, 0x00FF00, true);
+		totalScoreField.selectable = totalScoreField.mouseEnabled = false;
+		
 		setScore(0);
 		scoreField.autoSize = TextFieldAutoSize.CENTER;
 		scoreField.x = 60;
-		scoreField.y = 60;
+		scoreField.y = 30;
 		addChild(scoreField);
+		
+		totalScoreField.autoSize = TextFieldAutoSize.CENTER;
+		totalScoreField.x = 60;
+		totalScoreField.y = 70;
+		addChild(totalScoreField);
 		
 		addEventListener(Event.REMOVED_FROM_STAGE, onRemove);
 		addEventListener(Event.ADDED_TO_STAGE, onAdd);

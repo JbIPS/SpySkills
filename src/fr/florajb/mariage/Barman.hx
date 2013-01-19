@@ -3,6 +3,7 @@ package fr.florajb.mariage;
 import com.eclecticdesignstudio.motion.Actuate;
 import com.eclecticdesignstudio.motion.easing.Cubic;
 import haxe.FastList;
+import haxe.Timer;
 import nme.Assets;
 import nme.display.Bitmap;
 import nme.display.BitmapData;
@@ -53,7 +54,6 @@ class Barman extends Sprite
 		scoreField = new TextField();
 		timerField = new TextField();
 		levelField = new TextField();
-		initCookbook();
 		
 		#if iphone
 		Lib.current.stage.addEventListener(Event.RESIZE, init);
@@ -63,8 +63,10 @@ class Barman extends Sprite
 		addEventListener(Event.ENTER_FRAME, onEnterFrame);
 		addEventListener(Event.DEACTIVATE, onSpace);
 		addEventListener(Event.ACTIVATE, onSpace);
-		addEventListener(MouseEvent.CLICK, cheat);
+		Lib.current.stage.addEventListener(KeyboardEvent.KEY_DOWN, cheat);
 		InterLevel.instance.startMethod = startProxy;
+		EndScreen.instance.onContinue = restartLevel;
+		EndScreen.instance.onRestart = restartGame;
 	}
 
 	private function init(e: Event) 
@@ -75,13 +77,13 @@ class Barman extends Sprite
 		addChild(bkg);
 		
 		var shakerSprite = new Sprite();
-		shakerSprite.x = 300;
+		shakerSprite.x = 400;
 		shakerSprite.y = 25;
 		var plank = new Bitmap(Assets.getBitmapData("img/BluePlank.png"));
 		shakerSprite.addChild(plank);
 		shaker = new Bitmap(Assets.getBitmapData("img/shaker.png"));
-		shaker.x = 160;
-		shaker.y = 10;
+		shaker.x = 38;
+		shaker.y = 18;
 		shaker.scaleX = shaker.scaleY = 0.85;
 		shakerSprite.addChild(shaker);
 		
@@ -113,11 +115,14 @@ class Barman extends Sprite
 		startLevel();
 	}
 	
-	private function cheat(e:MouseEvent):Void 
+	private function cheat(e:KeyboardEvent):Void 
 	{
-		if(e.altKey){
+		if(e.keyCode == Keyboard.SPACE){
 			score = objective;
 			updateScore();
+			endLevel();
+		}
+		else if (e.keyCode == Keyboard.A){
 			endLevel();
 		}
 	}
@@ -127,18 +132,26 @@ class Barman extends Sprite
 		setPause(!paused);
 	}
 	
-	private function startLevel() : Void 
+	private function startLevel(restart: Bool = false) : Void 
 	{
-		if(level > 1)
-			removeChild(InterLevel.instance);
 		setPause(false);
+		clearCommands();
+		clearIngredients();
+		
+		if(!restart){
+			if(level > 1)
+				removeChild(InterLevel.instance);
+			initLevel();
+			initCookbook();
+		}
+		
 		startTime = Lib.getTimer();
 		objective = 500 * level;
 		
 		scoreField.defaultTextFormat = new TextFormat("_sans", 17, 0xFF0000, false);
+		score = 0;
 		updateScore();
 		
-		initLevel();
 		var loop = Assets.getSound("sfx/loop.mp3");
 		soundChannel = loop.play();
 		var soundTransform = new SoundTransform(0.15);
@@ -200,9 +213,9 @@ class Barman extends Sprite
 		var numCommand = currentCommands.length;
 		var command = new Command();
 		command.x = Lib.current.stage.stageWidth;
-		command.y = 50 + (numCommand*command.height + 10);
+		command.y = 5+ (numCommand * (command.height+10));
 		currentCommands.add(command);
-		Actuate.tween(command, 0.9, { x: Lib.current.stage.stageWidth - command.width + 5 } ).ease(Cubic.easeOut).delay(0.1);
+		Actuate.tween(command, 0.9, { x: Lib.current.stage.stageWidth - command.width + 30 } ).ease(Cubic.easeOut).delay(0.1);
 		addChild(command);
 	}
 	
@@ -211,12 +224,11 @@ class Barman extends Sprite
 		var ingredient = cast(e.target, Bottle);
 		if(ingredient.used){
 			ingredients.remove(ingredient);
-			ingredient.used = false;
 		}
 		else{
 			ingredients.push(ingredient);
-			ingredient.used = true;
 		}
+		ingredient.used = !ingredient.used;
 		
 	}
 	
@@ -252,19 +264,19 @@ class Barman extends Sprite
 	
 	private function endLevel() : Void 
 	{
-		setPause(true);
 		soundChannel.stop();
-		InterLevel.instance.score = score;
-		addChild(InterLevel.instance);
-		clearCommands();
-		clearIngredients();
 		
 		if (score >= objective) {
+			InterLevel.instance.score = score;
+			addChild(InterLevel.instance);
+			setPause(true);
 			level++;
 			levelField.text = "Niveau "+level;
-			initCookbook();
+			score = 0;
 		}
-		score = 0;
+		else{
+			endGame();
+		}
 		
 	}
 	
@@ -273,10 +285,11 @@ class Barman extends Sprite
 		startLevel();
 	}
 	
-	private function clearStage() : Void 
+	private function setStageVisible(visible: Bool) : Void 
 	{
-		while (numChildren > 0)
-			removeChildAt(numChildren - 1);
+		for (i in 0...numChildren) {
+			getChildAt(i).visible = visible;
+		}
 	}
 	
 	private function clearIngredients():Void 
@@ -311,6 +324,7 @@ class Barman extends Sprite
 			case 4:	createIngredient("gin");
 					createIngredient("triplesec");
 			case 5:	maxCommand++;
+			case 6: createIngredient("eau");
 			case 7:	createIngredient("menthe");
 		}
 	}
@@ -344,5 +358,25 @@ class Barman extends Sprite
 			addEventListener(Event.DEACTIVATE, onSpace);
 			removeEventListener(Event.ACTIVATE, onSpace);
 		}
+	}
+	
+	private function endGame():Void 
+	{
+		setStageVisible(false);
+		setPause(true);
+		addChild(EndScreen.instance);
+	}
+	
+	private function restartLevel(e: MouseEvent) : Void 
+	{
+		setStageVisible(true);
+		removeChild(EndScreen.instance);
+		startLevel(true);
+	}
+	
+	private function restartGame(e: MouseEvent) : Void 
+	{
+		Lib.current.removeChild(this);
+		Lib.current.addChild(new Barman());
 	}
 }

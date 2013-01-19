@@ -20,7 +20,6 @@ class Command extends Sprite
 	{
 		super();
 		var board = new Bitmap(Assets.getBitmapData("img/planche.png"));
-		board.scaleX = board.scaleY = 0.2;
 		addChild(board);
 		
 		var nextRecipe: Cocktail = null;
@@ -38,7 +37,7 @@ class Command extends Sprite
 		points = cocktail.points;
 		
 		var icon: Bitmap = new Bitmap(cocktail.icon);
-		icon.scaleX = icon.scaleY = 0.6;
+		//icon.scaleX = icon.scaleY = 0.6;
 		icon.x = icon.y = 10;
 		addChild(icon);
 		
@@ -46,8 +45,9 @@ class Command extends Sprite
 		recipeName.selectable = recipeName.mouseEnabled = false;
 		recipeName.defaultTextFormat = new TextFormat("_sans", 11, true);
 		recipeName.text = nextRecipe.name;
+		recipeName.height = recipeName.textHeight + 5;
 		recipeName.x = board.width / 2;
-		recipeName.y = board.height / 2 - 8;
+		recipeName.y = this.height / 2 - 8;
 		addChild(recipeName);
 	}
 	
