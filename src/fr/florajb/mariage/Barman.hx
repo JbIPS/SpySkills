@@ -12,6 +12,7 @@ import nme.display.Sprite;
 import nme.events.Event;
 import nme.events.KeyboardEvent;
 import nme.events.MouseEvent;
+import nme.filters.DropShadowFilter;
 import nme.Lib;
 import nme.media.SoundChannel;
 import nme.media.SoundTransform;
@@ -28,6 +29,7 @@ import nme.ui.Keyboard;
 class Barman extends Sprite 
 {	
 	private var shaker: Bitmap;
+	private var shakerSprite: Sprite;
 	private var score: Int;
 	private var startTime: Int;
 	private var remainingTime: Int;
@@ -76,18 +78,20 @@ class Barman extends Sprite
 		var bkg = new Bitmap(Assets.getBitmapData("img/Background.png"));
 		addChild(bkg);
 		
-		var shakerSprite = new Sprite();
+		shakerSprite = new Sprite();
 		shakerSprite.x = 400;
 		shakerSprite.y = 25;
 		var plank = new Bitmap(Assets.getBitmapData("img/BluePlank.png"));
 		shakerSprite.addChild(plank);
 		shaker = new Bitmap(Assets.getBitmapData("img/shaker.png"));
-		shaker.x = 38;
-		shaker.y = 18;
+		shaker.x = 36;
+		shaker.y = 15;
 		shaker.scaleX = shaker.scaleY = 0.85;
 		shakerSprite.addChild(shaker);
+		shakerSprite.filters = [new DropShadowFilter(5, 135, 0, 0.5, 10)];
 		
-		shakerSprite.addEventListener(MouseEvent.CLICK, onShakerClick);
+		shakerSprite.addEventListener(MouseEvent.MOUSE_DOWN, onShakerClick);
+		shakerSprite.addEventListener(MouseEvent.MOUSE_UP, onShakerClickEnd);
 		shakerSprite.buttonMode = true;
 		addChild(shakerSprite);
 		
@@ -162,6 +166,7 @@ class Barman extends Sprite
 	
 	private function onShakerClick(e:MouseEvent):Void 
 	{
+		shakerSprite.filters = [new DropShadowFilter(4, 135, 0, 0.4, 5)];
 		Actuate.tween(shaker, 0.05, { x: shaker.x + 10, y: shaker.y - 10 } ).repeat(5).reflect();
 		
 		for (command in currentCommands) {
@@ -173,6 +178,11 @@ class Barman extends Sprite
 		}
 		Assets.getSound("sfx/shaker.mp3").play();
 		clearIngredients();
+	}
+	
+	private function onShakerClickEnd(e:MouseEvent):Void 
+	{
+		shakerSprite.filters = [new DropShadowFilter(5, 135, 0, 0.5, 10)];
 	}
 	
 	private function validateCommand(command: Command) : Void 

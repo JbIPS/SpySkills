@@ -3,6 +3,7 @@ import com.eclecticdesignstudio.motion.Actuate;
 import nme.display.DisplayObject;
 import nme.display.SimpleButton;
 import nme.events.MouseEvent;
+import nme.filters.DropShadowFilter;
 
 /**
  * ...
@@ -18,6 +19,7 @@ class Bottle extends SimpleButton
 	{
 		super(icon, icon, icon, icon);
 		this.name = name;
+		filters = [new DropShadowFilter(5, 20, 0, 0.5)];
 	}
 	
 	public function setScale(scale: Float) : Float 

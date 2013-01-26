@@ -2,6 +2,7 @@ package fr.florajb.mariage;
 import nme.Assets;
 import nme.display.Bitmap;
 import nme.display.Sprite;
+import nme.filters.DropShadowFilter;
 import nme.Lib;
 import nme.text.TextField;
 import nme.text.TextFormat;
@@ -37,7 +38,6 @@ class Command extends Sprite
 		points = cocktail.points;
 		
 		var icon: Bitmap = new Bitmap(cocktail.icon);
-		//icon.scaleX = icon.scaleY = 0.6;
 		icon.x = icon.y = 10;
 		addChild(icon);
 		
@@ -49,6 +49,8 @@ class Command extends Sprite
 		recipeName.x = board.width / 2;
 		recipeName.y = this.height / 2 - 8;
 		addChild(recipeName);
+		
+		filters = [new DropShadowFilter(5, 135, 0, 0.5, 10)];
 	}
 	
 }
