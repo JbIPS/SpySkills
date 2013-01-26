@@ -46,7 +46,7 @@ class Command extends Sprite
 		recipeName.defaultTextFormat = new TextFormat("_sans", 11, true);
 		recipeName.text = nextRecipe.name;
 		recipeName.height = recipeName.textHeight + 5;
-		recipeName.x = board.width / 2;
+		recipeName.x = width - recipeName.width - 10;
 		recipeName.y = this.height / 2 - 8;
 		addChild(recipeName);
 		

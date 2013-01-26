@@ -1,6 +1,6 @@
 assets/img/._*.png
-bin/
-!bin/flash
+bin/.build
 bin/flash/haxe
 assets/img/Thumbs.db
 SpySkills.*
+!*.html
