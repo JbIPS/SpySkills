@@ -42,6 +42,7 @@ class Barman extends Sprite
 	private var levelField: TextField;
 	private var paused: Bool = false;
 	private var pauseTime: Int;
+	private var interLevel: InterLevel;
 	
 	private var ingredients: Array<Bottle>;
 	private var currentCommands: List<Command>;
@@ -66,7 +67,7 @@ class Barman extends Sprite
 		addEventListener(Event.DEACTIVATE, onSpace);
 		addEventListener(Event.ACTIVATE, onSpace);
 		Lib.current.stage.addEventListener(KeyboardEvent.KEY_DOWN, cheat);
-		InterLevel.instance.startMethod = startProxy;
+		interLevel = new InterLevel("interlevel", startProxy);
 		EndScreen.instance.onContinue = restartLevel;
 		EndScreen.instance.onRestart = restartGame;
 	}
@@ -144,7 +145,7 @@ class Barman extends Sprite
 		
 		if(!restart){
 			if(level > 1)
-				removeChild(InterLevel.instance);
+				removeChild(interLevel);
 			initLevel();
 			initCookbook();
 		}
@@ -277,8 +278,8 @@ class Barman extends Sprite
 		soundChannel.stop();
 		
 		if (score >= objective) {
-			InterLevel.instance.score = score;
-			addChild(InterLevel.instance);
+			interLevel.score = score;
+			addChild(interLevel);
 			setPause(true);
 			level++;
 			levelField.text = "Niveau "+level;

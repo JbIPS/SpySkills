@@ -21,6 +21,7 @@
 	<icon path="assets/swirl.svg" />
 	<assets path="assets/img" rename="img" />
 	<assets path="assets/sfx" rename="sfx" />
+	<assets path="assets/font" rename="font" />
 	
 	<!-- DLLs -->
 	<ndll name="std" />
@@ -28,8 +29,8 @@
 	<ndll name="zlib" />
 	<ndll name="nme" haxelib="nme" />
 
-	<!-- optimize JS output -->
-	<haxeflag name="--dead-code-elimination" if="html5" />
+	<!-- optimize JS output
+	<haxeflag name="--dead-code-elimination" if="html5" /> -->
 	<haxeflag name="--js-modern" if="html5" />
 	
 </project>

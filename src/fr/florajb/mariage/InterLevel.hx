@@ -13,6 +13,7 @@ import nme.media.SoundTransform;
 import nme.text.TextField;
 import nme.text.TextFieldAutoSize;
 import nme.text.TextFormat;
+import nme.text.TextFormatAlign;
 
 /**
  * ...
@@ -21,7 +22,6 @@ import nme.text.TextFormat;
 
 class InterLevel extends Sprite
 {
-	public static var instance (getInstance, null) : InterLevel;
 	
 	public var score (default, setScore): Int;
 	public var startMethod: Dynamic -> Void;
@@ -32,13 +32,6 @@ class InterLevel extends Sprite
 	private var scoreField: TextField;
 	private var soundChannel: SoundChannel;
 	
-	static public function getInstance() 
-	{
-		if (instance == null)
-			instance = new InterLevel();
-		return instance;
-	}
-	
 	public function setScore(score: Int) : Int 
 	{
 		this.score = score;
@@ -48,12 +41,80 @@ class InterLevel extends Sprite
 		return score;
 	}
 	
-	private function new() 
+	private function setMenu() : Void 
+	{
+		var menu = new Sprite();
+		menu.addChild(new Bitmap(Assets.getBitmapData("img/menu.png")));
+		menu.y = height - menu.height;
+		menu.x = 260;
+		
+		var title = new TextField();
+		title.embedFonts = true;
+		title.defaultTextFormat = new TextFormat(Assets.getFont("font/bebas.ttf").fontName, 50, TextFormatAlign.CENTER);
+		title.text = "Menu";
+		title.width = menu.width;
+		title.y = 55;
+		menu.addChild(title);
+		
+		var newIcon = new Bitmap(Assets.getBitmapData("img/b_newgame.png"));
+		var newButton = new SimpleButton(newIcon, newIcon, newIcon, newIcon);
+		newButton.x = 140;
+		newButton.y = 180;
+		newButton.addEventListener(MouseEvent.CLICK, startMethod);
+		menu.addChild(newButton);
+		
+		var instrIcon = new Bitmap(Assets.getBitmapData("img/b_instructions.png"));
+		var instrButton = new SimpleButton(instrIcon, instrIcon, instrIcon, instrIcon);
+		instrButton.x = newButton.x;
+		instrButton.y = newButton.y + 80;
+		menu.addChild(instrButton);
+		
+		var optionsIcon = new Bitmap(Assets.getBitmapData("img/b_options.png"));
+		var optionsButton = new SimpleButton(optionsIcon, optionsIcon, optionsIcon, optionsIcon);
+		optionsButton.x = instrButton.x;
+		optionsButton.y = instrButton.y + 80;
+		menu.addChild(optionsButton);
+		
+		addChild(menu);
+	}
+	
+	public function new(type: String, startMethod: Dynamic -> Void) 
 	{
 		super();
 		
-		addChild(new Bitmap(Assets.getBitmapData("img/Background.png")));
-		
+		addChild(new Bitmap(Assets.getBitmapData("img/menubackground.png")));
+		this.startMethod = startMethod;
+		if (type == "interlevel")
+			setInterlevel();
+		else{
+			setMenu();
+		}
+	}
+	
+	private function onRemove(e:Event):Void 
+	{
+		soundChannel.stop();
+		continueButton.enabled = continueButton.useHandCursor = false;
+		continueButton.removeEventListener(MouseEvent.CLICK, startMethod);
+	}
+	
+	private function onAdd(e:Event):Void 
+	{
+		var loop = Assets.getSound("sfx/interlevel.mp3");
+		soundChannel = loop.play();
+		var soundTransform = new SoundTransform(0.25);
+		soundChannel.soundTransform = soundTransform;
+		Timer.delay(activateButton, 500);
+	}
+	
+	private function activateButton() 
+	{
+		continueButton.enabled = continueButton.useHandCursor = true;
+		continueButton.addEventListener(MouseEvent.CLICK, startMethod);
+	}
+	
+	private function setInterlevel():Void 
+	{
 		var buttonIcon = new Bitmap(Assets.getBitmapData("img/BluePlank.png"));
 		continueButton = new SimpleButton(buttonIcon,buttonIcon,buttonIcon,buttonIcon);
 		continueButton.x = 300;
@@ -92,28 +153,6 @@ class InterLevel extends Sprite
 		
 		addEventListener(Event.REMOVED_FROM_STAGE, onRemove);
 		addEventListener(Event.ADDED_TO_STAGE, onAdd);
-	}
-	
-	private function onRemove(e:Event):Void 
-	{
-		soundChannel.stop();
-		continueButton.enabled = continueButton.useHandCursor = false;
-		continueButton.removeEventListener(MouseEvent.CLICK, startMethod);
-	}
-	
-	private function onAdd(e:Event):Void 
-	{
-		var loop = Assets.getSound("sfx/interlevel.mp3");
-		soundChannel = loop.play();
-		var soundTransform = new SoundTransform(0.25);
-		soundChannel.soundTransform = soundTransform;
-		Timer.delay(activateButton, 500);
-	}
-	
-	private function activateButton() 
-	{
-		continueButton.enabled = continueButton.useHandCursor = true;
-		continueButton.addEventListener(MouseEvent.CLICK, startMethod);
 	}
 	
 	

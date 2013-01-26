@@ -36,7 +36,7 @@ class BottleFactory
 			case "eau":		bottle.x = 385;
 							bottle.y = 296;
 			case "cola":	bottle.x = 455;
-							bottle.y = 323;
+							bottle.y = 325;
 			case "grenadine":bottle.x = 515;
 							bottle.y = 293;
 			case "sucre":	bottle.x = 570;
