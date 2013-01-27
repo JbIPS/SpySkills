@@ -2,6 +2,7 @@ package fr.florajb.mariage;
 
 import com.eclecticdesignstudio.motion.Actuate;
 import com.eclecticdesignstudio.motion.easing.Cubic;
+import com.eclecticdesignstudio.motion.easing.Sine;
 import haxe.FastList;
 import haxe.Timer;
 import nme.Assets;
@@ -55,8 +56,11 @@ class Barman extends Sprite
 		ingredients = new Array<Bottle>();
 		currentCommands = new List<Command>();
 		scoreField = new TextField();
+		scoreField.embedFonts = true;
 		timerField = new TextField();
+		timerField.embedFonts = true;
 		levelField = new TextField();
+		levelField.embedFonts = true;
 		
 		#if iphone
 		Lib.current.stage.addEventListener(Event.RESIZE, init);
@@ -96,7 +100,7 @@ class Barman extends Sprite
 		shakerSprite.buttonMode = true;
 		addChild(shakerSprite);
 		
-		var scoreFormat = new TextFormat("_sans", 17, 0xFF0000, false);
+		var scoreFormat = new TextFormat(Assets.getFont("font/blue_highway.ttf").fontName, 17, 0xFF0000, false);
 		
 		levelField.defaultTextFormat = scoreFormat;
 		levelField.selectable = levelField.mouseEnabled = false;
@@ -153,7 +157,7 @@ class Barman extends Sprite
 		startTime = Lib.getTimer();
 		objective = 500 * level;
 		
-		scoreField.defaultTextFormat = new TextFormat("_sans", 17, 0xFF0000, false);
+		scoreField.defaultTextFormat = new TextFormat(Assets.getFont("font/blue_highway.ttf").fontName, 17, 0xFF0000, false);
 		score = 0;
 		updateScore();
 		
@@ -189,13 +193,14 @@ class Barman extends Sprite
 	private function validateCommand(command: Command) : Void 
 	{
 		var points = new TextField();
-		var textFormat: TextFormat = new TextFormat("_sans", 15, 0xFFFFFF);
+		points.embedFonts = true;
+		var textFormat: TextFormat = new TextFormat(Assets.getFont("font/blue_highway.ttf").fontName, 15, 0xFFFFFF);
 		points.defaultTextFormat = textFormat;
 		points.selectable = points.mouseEnabled = false;
 		points.text = "+" + command.points + "Pts";
-		points.x = 350;
-		points.y = 80;
-		Actuate.tween(points, 3, { y: 50, alpha: 0 } );
+		points.x = shakerSprite.x;
+		points.y = shakerSprite.y;
+		Actuate.tween(points, 3, { y: y-10, alpha: 0 } ).ease(Cubic.easeOut);
 		addChild(points);
 		
 		score += command.points;
@@ -246,7 +251,7 @@ class Barman extends Sprite
 	private function updateScore() : Void 
 	{
 		if (score >= objective){
-			scoreField.defaultTextFormat = new TextFormat("_sans", 17, 0x00FF00, true);
+			scoreField.defaultTextFormat = new TextFormat(Assets.getFont("font/blue_highway.ttf").fontName, 17, 0x00FF00, true);
 		}
 		scoreField.text = "Score: " + score + "/" + objective;
 		scoreField.width = scoreField.textWidth+10;

@@ -42,11 +42,12 @@ class Command extends Sprite
 		addChild(icon);
 		
 		var recipeName = new TextField();
+		recipeName.embedFonts = true;
 		recipeName.selectable = recipeName.mouseEnabled = false;
-		recipeName.defaultTextFormat = new TextFormat("_sans", 11, true);
+		recipeName.defaultTextFormat = new TextFormat(Assets.getFont("font/blue_highway_cd.ttf").fontName, 20, true);
 		recipeName.text = nextRecipe.name;
 		recipeName.height = recipeName.textHeight + 5;
-		recipeName.x = width - recipeName.width - 10;
+		recipeName.x = icon.x + icon.width + 10;
 		recipeName.y = this.height / 2 - 8;
 		addChild(recipeName);
 		

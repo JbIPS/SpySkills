@@ -20,7 +20,7 @@ class Cookbook
 			case 1:	recipes.add(new Cocktail("Jus d'orange", Assets.getBitmapData("img/jusorange.png"), [ "orange"], 50));
 					recipes.add(new Cocktail("Jus d'ananas", Assets.getBitmapData("img/jusananas.png"), [ "ananas"], 50));
 					recipes.add(new Cocktail("Cola", Assets.getBitmapData("img/cola_verre.png"), [ "cola"], 50));
-					recipes.add(new Cocktail("Vodka Martini", Assets.getBitmapData("img/vodkamartini.png"), [ "vodka", "vermouth"], 100));
+					recipes.add(new Cocktail("Vodka \nMartini", Assets.getBitmapData("img/vodkamartini.png"), [ "vodka", "vermouth"], 100));
 					recipes.add(new Cocktail("Screwdriver", Assets.getBitmapData("img/screwdriver.png"), [ "vodka", "orange"], 100));
 			case 2:	recipes.add(new Cocktail("Daiquiri", Assets.getBitmapData("img/daiquiri.png"), [ "rhum", "sucre", "citron"], 150));
 					recipes.add(new Cocktail("Cuba Libre", Assets.getBitmapData("img/cubalibre.png"), [ "rhum", "cola", "citron"], 100));

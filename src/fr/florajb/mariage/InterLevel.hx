@@ -124,7 +124,8 @@ class InterLevel extends Sprite
 		
 		
 		var continueField = new TextField();
-		continueField.defaultTextFormat = new TextFormat("_sans", 22, 0xFFFF00, true);
+		continueField.embedFonts = true;
+		continueField.defaultTextFormat = new TextFormat(Assets.getFont("font/blue_highway.ttf").fontName, 22, 0xFFFF00, true);
 		continueField.x = 310;
 		continueField.y = 85;
 		continueField.selectable = continueField.mouseEnabled = false;
@@ -133,11 +134,13 @@ class InterLevel extends Sprite
 		addChild(continueField);
 		
 		scoreField = new TextField();
-		scoreField.defaultTextFormat = new TextFormat("_sans", 22, 0x00FF00, true);
+		scoreField.embedFonts = true;
+		scoreField.defaultTextFormat = new TextFormat(Assets.getFont("font/blue_highway.ttf").fontName, 22, 0x00FF00, true);
 		scoreField.selectable = scoreField.mouseEnabled = false;
 		
 		totalScoreField = new TextField();
-		totalScoreField.defaultTextFormat = new TextFormat("_sans", 22, 0x00FF00, true);
+		totalScoreField.embedFonts = true;
+		totalScoreField.defaultTextFormat = new TextFormat(Assets.getFont("font/blue_highway.ttf").fontName, 22, 0x00FF00, true);
 		totalScoreField.selectable = totalScoreField.mouseEnabled = false;
 		
 		setScore(0);
