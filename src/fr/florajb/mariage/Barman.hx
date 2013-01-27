@@ -121,6 +121,13 @@ class Barman extends Sprite
 		timerField.x = scoreField.x;
 		addChild(timerField);
 		
+		var recipeIcon = new Bitmap(Assets.getBitmapData("img/book.png"));
+		var recipeButton = new SimpleButton(recipeIcon, recipeIcon, recipeIcon, recipeIcon);
+		recipeButton.addEventListener(MouseEvent.CLICK, onRecipe);
+		recipeButton.x = width - recipeIcon.width;
+		recipeButton.y = height - recipeButton.height;
+		addChild(recipeButton);
+		
 		startLevel();
 	}
 	
@@ -139,6 +146,12 @@ class Barman extends Sprite
 	private function onSpace(e:Event) : Void 
 	{
 		setPause(!paused);
+	}
+	
+	private function onRecipe(e: MouseEvent) : Void 
+	{
+		setPause(true);
+		addChild(new InterLevel("cookbook"));
 	}
 	
 	private function startLevel(restart: Bool = false) : Void 
@@ -283,10 +296,11 @@ class Barman extends Sprite
 		soundChannel.stop();
 		
 		if (score >= objective) {
+			level++;
 			interLevel.score = score;
+			interLevel.update(level);
 			addChild(interLevel);
 			setPause(true);
-			level++;
 			levelField.text = "Niveau "+level;
 			score = 0;
 		}
@@ -324,24 +338,8 @@ class Barman extends Sprite
 	
 	private function initLevel():Void 
 	{		
-		switch(level){
-			case 1:	createIngredient("vodka");
-					createIngredient("orange");
-					createIngredient("cola");
-					createIngredient("vermouth");
-					createIngredient("ananas");
-			case 2:	maxCommand++;
-					createIngredient("rhum");
-					createIngredient("citron");
-					createIngredient("sucre");
-			case 3:	createIngredient("coco");
-					createIngredient("tequila");
-					createIngredient("grenadine");
-			case 4:	createIngredient("gin");
-					createIngredient("triplesec");
-			case 5:	maxCommand++;
-			case 6: createIngredient("eau");
-			case 7:	createIngredient("menthe");
+		for (ingredient in LevelManager.getNewIngredients(level)) {
+			createIngredient(ingredient);
 		}
 	}
 	
@@ -351,6 +349,7 @@ class Barman extends Sprite
 		ingredient.addEventListener(MouseEvent.CLICK, onIngredientClick);
 		addChild(ingredient);
 	}
+
 	
 	private function bottleToString(array: Array<Bottle>) : Array<String>
 	{

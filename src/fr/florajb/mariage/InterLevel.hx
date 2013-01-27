@@ -31,6 +31,9 @@ class InterLevel extends Sprite
 	private var totalScoreField: TextField;
 	private var scoreField: TextField;
 	private var soundChannel: SoundChannel;
+	private var cookFormat: TextFormat;
+	private var titleFormat: TextFormat;
+	private var bookSprite: Sprite;
 	
 	public function setScore(score: Int) : Int 
 	{
@@ -78,17 +81,39 @@ class InterLevel extends Sprite
 		addChild(menu);
 	}
 	
-	public function new(type: String, startMethod: Dynamic -> Void) 
+	public function new(type: String, ?startMethod: Dynamic -> Void) 
 	{
 		super();
 		
 		addChild(new Bitmap(Assets.getBitmapData("img/menubackground.png")));
 		this.startMethod = startMethod;
+		cookFormat = new TextFormat(Assets.getFont("font/blue_highway.ttf").fontName, 15);
+		titleFormat = new TextFormat(Assets.getFont("font/bebas.ttf").fontName, 20, TextFormatAlign.CENTER);
+		
 		if (type == "interlevel")
 			setInterlevel();
-		else{
+		else if(type == "menu"){
 			setMenu();
 		}
+		else{
+			setCookBook();
+		}
+	}
+	
+	public function update(level: Int) : Void 
+	{
+		while (bookSprite.numChildren > 1)
+			bookSprite.removeChildAt(bookSprite.numChildren - 1);
+		bookSprite.addChild(upgradeIngredients(level));
+		bookSprite.addChild(upgradeRecipes(level));
+	}
+	
+	private function setCookBook() : Void 
+	{
+		var cookbook = new Bitmap(Assets.getBitmapData("img/open-book.png"));
+		cookbook.x = width - cookbook.width;
+		cookbook.y = height - cookbook.height;
+		addChild(cookbook);
 	}
 	
 	private function onRemove(e:Event):Void 
@@ -104,59 +129,150 @@ class InterLevel extends Sprite
 		soundChannel = loop.play();
 		var soundTransform = new SoundTransform(0.25);
 		soundChannel.soundTransform = soundTransform;
-		Timer.delay(activateButton, 500);
-	}
-	
-	private function activateButton() 
-	{
-		continueButton.enabled = continueButton.useHandCursor = true;
-		continueButton.addEventListener(MouseEvent.CLICK, startMethod);
 	}
 	
 	private function setInterlevel():Void 
-	{
-		var buttonIcon = new Bitmap(Assets.getBitmapData("img/BluePlank.png"));
-		continueButton = new SimpleButton(buttonIcon,buttonIcon,buttonIcon,buttonIcon);
-		continueButton.x = 300;
-		continueButton.y = 25;
-		continueButton.enabled = continueButton.useHandCursor = false;
-		addChild(continueButton);
-		
-		
-		var continueField = new TextField();
-		continueField.embedFonts = true;
-		continueField.defaultTextFormat = new TextFormat(Assets.getFont("font/blue_highway.ttf").fontName, 22, 0xFFFF00, true);
-		continueField.x = 310;
-		continueField.y = 85;
-		continueField.selectable = continueField.mouseEnabled = false;
-		continueField.text = "CONTINUE";
-		continueField.autoSize = TextFieldAutoSize.CENTER;
-		addChild(continueField);
-		
+	{	
+		// Score
+		var textFormat = new TextFormat(Assets.getFont("font/blue_highway.ttf").fontName, 22, 0x00FF00, true);
 		scoreField = new TextField();
 		scoreField.embedFonts = true;
-		scoreField.defaultTextFormat = new TextFormat(Assets.getFont("font/blue_highway.ttf").fontName, 22, 0x00FF00, true);
+		scoreField.defaultTextFormat = textFormat;
 		scoreField.selectable = scoreField.mouseEnabled = false;
 		
 		totalScoreField = new TextField();
 		totalScoreField.embedFonts = true;
-		totalScoreField.defaultTextFormat = new TextFormat(Assets.getFont("font/blue_highway.ttf").fontName, 22, 0x00FF00, true);
+		totalScoreField.defaultTextFormat = textFormat;
 		totalScoreField.selectable = totalScoreField.mouseEnabled = false;
 		
 		setScore(0);
 		scoreField.autoSize = TextFieldAutoSize.CENTER;
-		scoreField.x = 60;
-		scoreField.y = 30;
+		scoreField.x = 10;
+		scoreField.y = 400;
 		addChild(scoreField);
 		
 		totalScoreField.autoSize = TextFieldAutoSize.CENTER;
-		totalScoreField.x = 60;
-		totalScoreField.y = 70;
+		totalScoreField.x = 10;
+		totalScoreField.y = 450;
 		addChild(totalScoreField);
+		
+		// Upgrades
+		bookSprite = new Sprite();
+		var cookbook = new Bitmap(Assets.getBitmapData("img/open-book.png"));
+		bookSprite.x = width - cookbook.width;
+		bookSprite.y = height - cookbook.height;
+		bookSprite.addChild(cookbook);
+		
+		update(0);
+		
+		addChild(bookSprite);
 		
 		addEventListener(Event.REMOVED_FROM_STAGE, onRemove);
 		addEventListener(Event.ADDED_TO_STAGE, onAdd);
 	}
+	
+	private function displayIngredient(name: String) : Sprite 
+	{
+		var ingredient = new Sprite();
+		var icon = new Bitmap(Assets.getBitmapData("img/" + name + ".png"));
+		if(name != "menthe" && name != "citron" && name != "coco")
+			icon.scaleX = icon.scaleY = 70 / icon.height;
+		var tf = new TextField();
+		tf.embedFonts = true;
+		tf.defaultTextFormat = cookFormat;
+		tf.text = setTitleCase(name);
+		tf.x = icon.width + 20;
+		tf.selectable = tf.mouseEnabled = false;
+		ingredient.addChild(icon);
+		ingredient.addChild(tf);
+		
+		return ingredient;		
+	}
+	
+	private function displayCocktail(cocktail: Cocktail) : Sprite 
+	{
+		var cocktailSprite = new Sprite();
+		var icon = new Bitmap(cocktail.icon);
+		var tf = new TextField();
+		tf.embedFonts = true;
+		tf.defaultTextFormat = cookFormat;
+		var reg : EReg = ~/\n/g;
+		tf.text = reg.replace(cocktail.name, "");
+		for (ing in cocktail.recipe)
+			tf.text += "\n\t- " + setTitleCase(ing);
+		tf.x = icon.width + 20;
+		tf.width = tf.textWidth+10;
+		tf.height = tf.textHeight;
+		tf.selectable = tf.mouseEnabled = false;
+		cocktailSprite.addChild(icon);
+		cocktailSprite.addChild(tf);
+		
+		return cocktailSprite;		
+	}
+	
+	private function setTitleCase(name: String):String 
+	{
+		return name.charAt(0).toUpperCase() + name.substr(1);
+	}
+	
+	private function upgradeRecipes(level: Int):Sprite 
+	{
+		var sprite = new Sprite();
+		var newRecipes = LevelManager.getNewRecipes(level);
+		if (Lambda.count(newRecipes) == 0)
+			return sprite;
+
+		var recipes = new TextField();
+		recipes.embedFonts = true;
+		recipes.defaultTextFormat = titleFormat;
+		recipes.text = Lambda.count(newRecipes) > 1 ? "Nouveaux cocktails" : "Nouveau cocktail";
+		recipes.width = bookSprite.width / 2;
+		recipes.x = bookSprite.width / 2;
+		recipes.y = 65;
+		recipes.selectable = recipes.mouseEnabled = false;
+		sprite.addChild(recipes);
+		
+		var yOffset: Float = 120;
+		var xOffset: Float = 50 + bookSprite.width /2;
+		for (recipe in newRecipes) {
+			var rec = displayCocktail(recipe);
+			rec.x = xOffset;
+			rec.y = yOffset + 5;
+			yOffset += rec.height;
+			sprite.addChild(rec);
+		}
+		return sprite;
+	}
+	
+	private function upgradeIngredients(level: Int):Sprite 
+	{
+		var sprite = new Sprite();
+		var newIngredients = LevelManager.getNewIngredients(level);
+		
+		if(Lambda.count(newIngredients) > 0){
+			var ingredients = new TextField();
+			ingredients.embedFonts = true;
+			ingredients.defaultTextFormat = titleFormat;
+			ingredients.text = Lambda.count(newIngredients) > 1 ? "Nouveaux Ingredients" : "Nouvel Ingredient";
+			ingredients.width = bookSprite.width / 2 ;
+			ingredients.y = 65;
+			ingredients.selectable = ingredients.mouseEnabled = false;
+			sprite.addChild(ingredients);
+			
+			var yOffset: Float = 120;
+			var xOffset: Float = 70;
+			for (ingredient in newIngredients) {
+				var ing = displayIngredient(ingredient);
+				ing.x = xOffset;
+				ing.y = yOffset + 15;
+				yOffset += ing.height;
+				sprite.addChild(ing);
+			}
+		}
+		return sprite;
+	}
+	
+	
 	
 	
 	
