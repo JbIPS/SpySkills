@@ -151,7 +151,13 @@ class Barman extends Sprite
 	private function onRecipe(e: MouseEvent) : Void 
 	{
 		setPause(true);
-		addChild(new InterLevel("cookbook"));
+		addChild(new InterLevel("cookbook", removeRecipe));
+	}
+	
+	private function removeRecipe(e: MouseEvent) : Void 
+	{
+		setPause(false);
+		removeChildAt(numChildren - 1);
 	}
 	
 	private function startLevel(restart: Bool = false) : Void 
@@ -186,15 +192,19 @@ class Barman extends Sprite
 	{
 		shakerSprite.filters = [new DropShadowFilter(4, 135, 0, 0.4, 5)];
 		Actuate.tween(shaker, 0.05, { x: shaker.x + 10, y: shaker.y - 10 } ).repeat(5).reflect();
+		var correct = false;
 		
 		for (command in currentCommands) {
 			if (command.cocktail.equalsRecipe(bottleToString(ingredients))) {
 				currentCommands.remove(command);
+				correct = true;
 				validateCommand(command);
+				Assets.getSound("sfx/shaker.mp3").play();
 				break;
 			}
 		}
-		Assets.getSound("sfx/shaker.mp3").play();
+		if (!correct)
+			Assets.getSound("sfx/shaker_wrong.mp3").play();
 		clearIngredients();
 	}
 	
@@ -393,5 +403,6 @@ class Barman extends Sprite
 	{
 		Lib.current.removeChild(this);
 		Lib.current.addChild(new Barman());
+		Cookbook.instance.empty();
 	}
 }

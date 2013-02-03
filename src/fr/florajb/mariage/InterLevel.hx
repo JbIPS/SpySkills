@@ -79,7 +79,7 @@ class InterLevel extends Sprite {
         addChild(menu);
     }
 
-    public function new(type: String, ?startMethod: Dynamic -> Void)
+    public function new(type: String, startMethod: Dynamic -> Void)
     {
         super();
 
@@ -100,19 +100,53 @@ class InterLevel extends Sprite {
 
     public function update(level: Int): Void
     {
-        while(bookSprite.numChildren > 1)
-            bookSprite.removeChildAt(bookSprite.numChildren - 1);
-        bookSprite.addChild(upgradeIngredients(level));
-        bookSprite.addChild(upgradeRecipes(level));
+		var i = 0;
+        while (bookSprite.numChildren > 2) {
+			if(Std.is(bookSprite.getChildAt(i), Sprite))
+				bookSprite.removeChildAt(i);
+			else
+				i++;
+		}
+        bookSprite.addChildAt(upgradeIngredients(level), 1);
+        bookSprite.addChildAt(upgradeRecipes(level), 2);
     }
 
     private function setCookBook(): Void
     {
-        var cookbook = new Bitmap(Assets.getBitmapData("img/open-book.png"));
-        cookbook.x = width - cookbook.width;
-        cookbook.y = height - cookbook.height;
-        addChild(cookbook);
+        displayCookbook();
+		
+		var array = new Array<Cocktail>();
+		for(recipe in Cookbook.instance.recipes){
+			array.push(recipe);
+		}
+		array.sort(sort);
+		
+        var yOffset: Float = 30;
+        var xOffset: Float = 50;
+		var nbRecipe = 0;
+		for (recipe in array) {
+			if (nbRecipe == 3){
+				xOffset += bookSprite.width / 2;
+				yOffset = 30;
+			}
+			var rec = displayCocktail(recipe);
+			rec.x = xOffset;
+            rec.y = yOffset;// + 10;
+            yOffset += rec.height+20;
+			bookSprite.addChild(rec);
+			nbRecipe++;
+		}
+		
+		addChild(bookSprite);
     }
+	
+	private function sort(x: Cocktail, y: Cocktail) : Int 
+	{
+		if (x.name < y.name)
+			return -1;
+		else
+			return 1;
+	}
 
     private function onRemove(e: Event): Void
     {
@@ -153,29 +187,31 @@ class InterLevel extends Sprite {
         addChild(totalScoreField);
 
         // Upgrades
-        bookSprite = new Sprite();
-        var cookbook = new Bitmap(Assets.getBitmapData("img/open-book.png"));
-        bookSprite.x = width - cookbook.width;
-        bookSprite.y = height - cookbook.height;
-        bookSprite.addChild(cookbook);
+        displayCookbook();
 
         update(0);
-
-        var continueButton = new Sprite();
-        continueButton.graphics.beginFill(0x00FF00);
-        continueButton.graphics.drawRect(0, 0, 20, 20);
-        continueButton.graphics.endFill();
-        //continueButton.x = 100;
-        //continueButton.y = 100;
-        continueButton.buttonMode = true;
-        continueButton.addEventListener(MouseEvent.CLICK, startMethod);
-        addChild(continueButton);
 
         addChild(bookSprite);
 
         addEventListener(Event.REMOVED_FROM_STAGE, onRemove);
         addEventListener(Event.ADDED_TO_STAGE, onAdd);
     }
+	
+	private function displayCookbook() : Void 
+	{
+        bookSprite = new Sprite();
+        var cookbook = new Bitmap(Assets.getBitmapData("img/open-book.png"));
+        bookSprite.x = width - cookbook.width;
+        bookSprite.y = height - cookbook.height;
+        bookSprite.addChild(cookbook);
+
+        var continueIcon = new Bitmap(Assets.getBitmapData("img/b_continue.png"));
+		var continueButton = new SimpleButton(continueIcon, continueIcon, continueIcon, continueIcon);
+        continueButton.x = bookSprite.width - continueButton.width - 25;
+        continueButton.y = bookSprite.height - continueButton.height - 20;
+        continueButton.addEventListener(MouseEvent.CLICK, startMethod);
+        bookSprite.addChild(continueButton);
+	}
 
     private function displayIngredient(name: String): Sprite
     {
@@ -208,7 +244,6 @@ class InterLevel extends Sprite {
             tf.text += "\n\t- " + setTitleCase(ing);
         tf.x = icon.width + 20;
         tf.width = tf.textWidth + 10;
-        tf.height = tf.textHeight;
         tf.selectable = tf.mouseEnabled = false;
         cocktailSprite.addChild(icon);
         cocktailSprite.addChild(tf);

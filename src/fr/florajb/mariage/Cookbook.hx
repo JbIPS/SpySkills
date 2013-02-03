@@ -21,6 +21,11 @@ class Cookbook
 		}
 	}
 	
+	public function empty() : Void 
+	{
+		recipes = new FastList<Cocktail>();
+	}
+	
 	private function new () {
 		recipes = new FastList<Cocktail>();		
 	}	
