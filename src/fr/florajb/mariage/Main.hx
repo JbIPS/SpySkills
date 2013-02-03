@@ -16,14 +16,21 @@ class Main
 		stage.scaleMode = nme.display.StageScaleMode.NO_SCALE;
 		stage.align = nme.display.StageAlign.TOP_LEFT;
 		
-		var menu = new InterLevel("menu", startGame);
-		Lib.current.addChild(menu);
+		displayMenu(null);
 	}
 	
 	private static function startGame(e: Event) : Void 
 	{
+		var game = new Barman();
+		game.addEventListener(Event.COMPLETE, displayMenu);
 		Lib.current.removeChildAt(0);
-		Lib.current.addChild(new Barman());
+		Lib.current.addChild(game);
+	}
+	
+	private static function displayMenu(e: Event) : Void 
+	{
+		var menu = new InterLevel("menu", startGame);
+		Lib.current.addChild(menu);
 	}
 	
 	public function new() : Void 

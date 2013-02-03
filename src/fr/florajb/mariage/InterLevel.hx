@@ -24,14 +24,16 @@ class InterLevel extends Sprite {
 
     public var score (default, setScore): Int;
     public var startMethod: Dynamic -> Void;
-
-    private var totalScore: Int = 0;
+    public var totalScore: Int = 0;
+	
     private var totalScoreField: TextField;
     private var scoreField: TextField;
     private var soundChannel: SoundChannel;
     private var cookFormat: TextFormat;
     private var titleFormat: TextFormat;
     private var bookSprite: Sprite;
+	private var pageIndex: Int = 1;
+	private var sortRecipes: Array<Cocktail>;
 
     public function setScore(score: Int): Int
     {
@@ -115,21 +117,48 @@ class InterLevel extends Sprite {
     {
         displayCookbook();
 		
-		var array = new Array<Cocktail>();
+		sortRecipes = new Array<Cocktail>();
 		for(recipe in Cookbook.instance.recipes){
-			array.push(recipe);
+			sortRecipes.push(recipe);
 		}
-		array.sort(sort);
+		sortRecipes.sort(sort);
+		
+		displayPage();
+		
+		addChild(bookSprite);
+    }
+	
+	private function turnPage(e: MouseEvent) : Void 
+	{
+		pageIndex++;
+		displayPage();
+	}
+	
+	private function returnPage(e: MouseEvent) : Void 
+	{
+		pageIndex--;
+		displayPage();
+	}
+	
+	private function displayPage() : Void 
+	{
+		var i = 0;
+        while (bookSprite.numChildren > 2) {
+			if(Std.is(bookSprite.getChildAt(i), Sprite))
+				bookSprite.removeChildAt(i);
+			else
+				i++;
+		}
 		
         var yOffset: Float = 30;
         var xOffset: Float = 50;
 		var nbRecipe = 0;
-		for (recipe in array) {
+		for (i in (pageIndex-1)*6...cast(Math.min(pageIndex*6, sortRecipes.length), Int)) {
 			if (nbRecipe == 3){
 				xOffset += bookSprite.width / 2;
 				yOffset = 30;
 			}
-			var rec = displayCocktail(recipe);
+			var rec = displayCocktail(sortRecipes[i]);
 			rec.x = xOffset;
             rec.y = yOffset;// + 10;
             yOffset += rec.height+20;
@@ -137,8 +166,30 @@ class InterLevel extends Sprite {
 			nbRecipe++;
 		}
 		
-		addChild(bookSprite);
-    }
+		if(Math.min(pageIndex*6, sortRecipes.length) != sortRecipes.length){
+			var cornerBmp = new Bitmap(Assets.getBitmapData("img/book-corner.png"));
+			var corner = new Sprite();
+			corner.addChild(cornerBmp);
+			corner.x = bookSprite.width - corner.width - 18;
+			corner.y = 11;
+			corner.buttonMode = true;
+			corner.addEventListener(MouseEvent.CLICK, turnPage);
+		
+			bookSprite.addChild(corner);
+		}
+		if(pageIndex > 1){
+			var cornerBmp = new Bitmap(Assets.getBitmapData("img/book-corner.png"));
+			cornerBmp.scaleX = -1;
+			var corner = new Sprite();
+			corner.addChild(cornerBmp);
+			corner.x = corner.width + 18;
+			corner.y = 11;
+			corner.buttonMode = true;
+			corner.addEventListener(MouseEvent.CLICK, returnPage);
+		
+			bookSprite.addChild(corner);
+		}		
+	}
 	
 	private function sort(x: Cocktail, y: Cocktail) : Int 
 	{
@@ -203,7 +254,7 @@ class InterLevel extends Sprite {
         var cookbook = new Bitmap(Assets.getBitmapData("img/open-book.png"));
         bookSprite.x = width - cookbook.width;
         bookSprite.y = height - cookbook.height;
-        bookSprite.addChild(cookbook);
+        bookSprite.addChild(cookbook);		
 
         var continueIcon = new Bitmap(Assets.getBitmapData("img/b_continue.png"));
 		var continueButton = new SimpleButton(continueIcon, continueIcon, continueIcon, continueIcon);
@@ -240,8 +291,18 @@ class InterLevel extends Sprite {
         tf.defaultTextFormat = cookFormat;
         var reg: EReg = ~/\n/g;
         tf.text = reg.replace(cocktail.name, "");
-        for(ing in cocktail.recipe)
-            tf.text += "\n\t- " + setTitleCase(ing);
+		if(Lambda.count(cocktail.recipe) < 5){
+			for(ing in cocktail.recipe)
+				tf.text += "\n   - " + setTitleCase(ing);
+		}
+		else{
+			var array = new Array<String>();
+			for (ing in cocktail.recipe)
+				array.push(ing);
+			for(i in 0...4){
+				tf.text += "\n   - " + setTitleCase(array[i]) + (array.length > (i + 4) ? "  - " + setTitleCase(array[i + 4]):"");
+			}
+		}
         tf.x = icon.width + 20;
         tf.width = tf.textWidth + 10;
         tf.selectable = tf.mouseEnabled = false;

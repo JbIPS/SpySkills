@@ -21,6 +21,8 @@ import nme.text.TextField;
 import nme.text.TextFormat;
 import nme.text.TextFormatAlign;
 import nme.ui.Keyboard;
+import nme.net.SharedObject;
+import nme.net.SharedObjectFlushStatus;
 
 /**
  * ...
@@ -306,18 +308,92 @@ class Barman extends Sprite
 		soundChannel.stop();
 		
 		if (score >= objective) {
-			level++;
-			interLevel.score = score;
-			interLevel.update(level);
-			addChild(interLevel);
 			setPause(true);
-			levelField.text = "Niveau "+level;
-			score = 0;
+			if (level == 10) {
+				var black = new Sprite();
+				black.graphics.beginFill(0x000000);
+				black.graphics.drawRect(0, 0, width, height);
+				black.graphics.endFill();
+				addChild(black);
+				addChild(new Bitmap(Assets.getBitmapData("img/canon.png")));
+				var tf = new TextField();
+				tf.embedFonts = true;
+				tf.defaultTextFormat = new TextFormat(Assets.getFont("font/blue_highway.ttf").fontName, 17, 0xFF0000, true, TextFormatAlign.CENTER);
+				tf.text = " Félicitations, vous maitrisez vos cocktails";
+				tf.text += "\n\n score : " + interLevel.totalScore;
+				tf.width = Lib.current.stage.stageWidth;
+				tf.selectable = tf.mouseEnabled = false;
+				tf.y = 200;
+				addChild(tf);
+				
+				var submitSprite = new Sprite();
+				var submit = new TextField();
+				submit.embedFonts = true;
+				submit.defaultTextFormat = new TextFormat(Assets.getFont("font/blue_highway.ttf").fontName, 17, 0xFF0000, true);
+				submit.text = "Soumettre";
+				submit.selectable = false;
+				submit.y = 300;
+				submit.x = 300;
+				submit.height = submit.textHeight + 10;
+				//submitSprite.graphics.beginFill(0x000000);
+				//submitSprite.graphics.drawRect(0, 0, submit.width, submit.height);
+				//submitSprite.graphics.endFill();
+				submitSprite.addChild(submit);
+				submitSprite.mouseChildren = false;
+				submitSprite.buttonMode = submitSprite.useHandCursor = true;
+				submitSprite.addEventListener(MouseEvent.CLICK, onSubmit);
+				addChild(submitSprite);
+				
+				var restartSprite = new Sprite();
+				var restart = new TextField();
+				restart.embedFonts = true;
+				restart.defaultTextFormat = new TextFormat(Assets.getFont("font/blue_highway.ttf").fontName, 17, 0xFF0000, true);
+				restart.text = "Rejouer";
+				restart.selectable = false;
+				restart.y = 300;
+				restart.x = 450;
+				restart.height = restart.textHeight + 10;
+				//restartSprite.graphics.beginFill(0x0FF000);
+				//restartSprite.graphics.drawRect(0, 0,restart.width, restart.height);
+				//restartSprite.graphics.endFill();	
+				restartSprite.addChild(restart);
+				restartSprite.mouseChildren = false;
+				restartSprite.buttonMode = restartSprite.useHandCursor = true;			
+				restartSprite.addEventListener(MouseEvent.CLICK, restartGame);
+				addChild(restartSprite);
+			}
+			else{
+				level++;
+				interLevel.score = score;
+				interLevel.update(level);
+				addChild(interLevel);
+				levelField.text = "Niveau "+level;
+				score = 0;				
+			}
 		}
 		else{
 			endGame();
 		}
 		
+	}
+	
+	private function onSubmit(e: MouseEvent) : Void 
+	{
+		var highScore = SharedObject.getLocal( "storage-test" );
+		highScore.data.message = interLevel.totalScore;
+		#if ( cpp || neko )
+			var flushStatus:SharedObjectFlushStatus = null;
+		#else
+			var flushStatus:String = null;
+		#end
+		
+		try {
+			flushStatus = highScore.flush() ;
+			Lib.trace("Ok. "+highScore.data.message);
+		} catch ( e: Dynamic ) {
+			Lib.trace("Impossible to write highscore");
+		}
+		restartGame(null);
 	}
 	
 	private function startProxy(e:MouseEvent) : Void
@@ -402,7 +478,7 @@ class Barman extends Sprite
 	private function restartGame(e: MouseEvent) : Void 
 	{
 		Lib.current.removeChild(this);
-		Lib.current.addChild(new Barman());
 		Cookbook.instance.empty();
+		dispatchEvent(new Event(Event.COMPLETE));
 	}
 }
