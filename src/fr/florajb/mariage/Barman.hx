@@ -2,12 +2,8 @@ package fr.florajb.mariage;
 
 import com.eclecticdesignstudio.motion.Actuate;
 import com.eclecticdesignstudio.motion.easing.Cubic;
-import com.eclecticdesignstudio.motion.easing.Sine;
-import haxe.FastList;
-import haxe.Timer;
 import nme.Assets;
 import nme.display.Bitmap;
-import nme.display.BitmapData;
 import nme.display.SimpleButton;
 import nme.display.Sprite;
 import nme.events.Event;
@@ -17,12 +13,12 @@ import nme.filters.DropShadowFilter;
 import nme.Lib;
 import nme.media.SoundChannel;
 import nme.media.SoundTransform;
+import nme.net.SharedObject;
+import nme.net.SharedObjectFlushStatus;
 import nme.text.TextField;
 import nme.text.TextFormat;
 import nme.text.TextFormatAlign;
 import nme.ui.Keyboard;
-import nme.net.SharedObject;
-import nme.net.SharedObjectFlushStatus;
 
 /**
  * ...
@@ -39,13 +35,13 @@ class Barman extends Sprite
 	private var lastCommandTime: Int;
 	private var level: Int = 1;
 	private var objective: Int;
-	private var maxCommand: Int = 1;
 	private var scoreField: TextField;
 	private var timerField: TextField;
 	private var levelField: TextField;
 	private var paused: Bool = false;
 	private var pauseTime: Int;
 	private var interLevel: InterLevel;
+	private var highScore: SharedObject;
 	
 	private var ingredients: Array<Bottle>;
 	private var currentCommands: List<Command>;
@@ -76,10 +72,14 @@ class Barman extends Sprite
 		interLevel = new InterLevel("interlevel", startProxy);
 		EndScreen.instance.onContinue = restartLevel;
 		EndScreen.instance.onRestart = restartGame;
+		
 	}
 
 	private function init(e: Event) 
 	{
+		highScore = SharedObject.getLocal( "storage-test" );
+		Lib.trace("highScore: " + highScore.data.meesage);
+		
 		removeEventListener(MouseEvent.CLICK, init);
 		
 		var bkg = new Bitmap(Assets.getBitmapData("img/Background.png"));
@@ -298,7 +298,7 @@ class Barman extends Sprite
 			endLevel();
 		}
 		else if (Math.round((Lib.getTimer() - lastCommandTime)/1000) > 3) {
-			if(currentCommands.length < maxCommand)
+			if (currentCommands.length < LevelManager.getMaxCommand(level))
 				addCommand();
 		}
 	}
@@ -335,9 +335,6 @@ class Barman extends Sprite
 				submit.y = 300;
 				submit.x = 300;
 				submit.height = submit.textHeight + 10;
-				//submitSprite.graphics.beginFill(0x000000);
-				//submitSprite.graphics.drawRect(0, 0, submit.width, submit.height);
-				//submitSprite.graphics.endFill();
 				submitSprite.addChild(submit);
 				submitSprite.mouseChildren = false;
 				submitSprite.buttonMode = submitSprite.useHandCursor = true;
@@ -353,9 +350,6 @@ class Barman extends Sprite
 				restart.y = 300;
 				restart.x = 450;
 				restart.height = restart.textHeight + 10;
-				//restartSprite.graphics.beginFill(0x0FF000);
-				//restartSprite.graphics.drawRect(0, 0,restart.width, restart.height);
-				//restartSprite.graphics.endFill();	
 				restartSprite.addChild(restart);
 				restartSprite.mouseChildren = false;
 				restartSprite.buttonMode = restartSprite.useHandCursor = true;			
@@ -379,7 +373,6 @@ class Barman extends Sprite
 	
 	private function onSubmit(e: MouseEvent) : Void 
 	{
-		var highScore = SharedObject.getLocal( "storage-test" );
 		highScore.data.message = interLevel.totalScore;
 		#if ( cpp || neko )
 			var flushStatus:SharedObjectFlushStatus = null;
