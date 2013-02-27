@@ -5,3 +5,6 @@ bin/flash/haxe
 assets/img/Thumbs.db
 SpySkills.*
 !*.html
+assets/sfx/.DS_Store
+
+bin/flash/bin/.DS_Store
