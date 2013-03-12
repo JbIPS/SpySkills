@@ -22,9 +22,10 @@ import nme.text.TextFormatAlign;
 
 class InterLevel extends Sprite {
 
+    public static var totalScore: Int = 0;
+    
     public var score (default, setScore): Int;
     public var startMethod: Dynamic -> Void;
-    public var totalScore: Int = 0;
 	
     private var totalScoreField: TextField;
     private var scoreField: TextField;

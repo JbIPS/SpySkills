@@ -41,7 +41,6 @@ class Barman extends Sprite
 	private var paused: Bool = false;
 	private var pauseTime: Int;
 	private var interLevel: InterLevel;
-	private var highScore: SharedObject;
 	
 	private var ingredients: Array<Bottle>;
 	private var currentCommands: List<Command>;
@@ -72,14 +71,10 @@ class Barman extends Sprite
 		interLevel = new InterLevel("interlevel", startProxy);
 		EndScreen.instance.onContinue = restartLevel;
 		EndScreen.instance.onRestart = restartGame;
-		
 	}
 
 	private function init(e: Event) 
-	{
-		highScore = SharedObject.getLocal( "storage-test" );
-		Lib.trace("highScore: " + highScore.data.meesage);
-		
+	{	
 		removeEventListener(MouseEvent.CLICK, init);
 		
 		var bkg = new Bitmap(Assets.getBitmapData("img/Background.png"));
@@ -320,7 +315,7 @@ class Barman extends Sprite
 				tf.embedFonts = true;
 				tf.defaultTextFormat = new TextFormat(Assets.getFont("font/blue_highway.ttf").fontName, 17, 0xFF0000, true, TextFormatAlign.CENTER);
 				tf.text = " Félicitations, vous maitrisez vos cocktails";
-				tf.text += "\n\n score : " + interLevel.totalScore;
+				tf.text += "\n\n score : " + InterLevel.totalScore;
 				tf.width = Lib.current.stage.stageWidth;
 				tf.selectable = tf.mouseEnabled = false;
 				tf.y = 200;
@@ -373,20 +368,7 @@ class Barman extends Sprite
 	
 	private function onSubmit(e: MouseEvent) : Void 
 	{
-		highScore.data.message = interLevel.totalScore;
-		#if ( cpp || neko )
-			var flushStatus:SharedObjectFlushStatus = null;
-		#else
-			var flushStatus:String = null;
-		#end
-		
-		try {
-			flushStatus = highScore.flush() ;
-			Lib.trace("Ok. "+highScore.data.message);
-		} catch ( e: Dynamic ) {
-			Lib.trace("Impossible to write highscore");
-		}
-		restartGame(null);
+		EndScreen.instance.onSubmit(e);
 	}
 	
 	private function startProxy(e:MouseEvent) : Void

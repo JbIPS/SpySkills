@@ -1,6 +1,7 @@
 package fr.florajb.mariage;
 import nme.events.Event;
 import nme.Lib;
+import nme.external.ExternalInterface;
 
 /**
  * ...
@@ -16,6 +17,7 @@ class Main
 		stage.scaleMode = nme.display.StageScaleMode.NO_SCALE;
 		stage.align = nme.display.StageAlign.TOP_LEFT;
 		
+		ExternalInterface.addCallback("quit", quit);
 		displayMenu(null);
 	}
 	
@@ -36,6 +38,10 @@ class Main
 	public function new() : Void 
 	{
 		
+	}
+	
+	public static function quit(){
+		Lib.exit();
 	}
 	
 }
