@@ -135,7 +135,7 @@ class Barman extends Sprite
 			updateScore();
 			endLevel();
 		}
-		else if (e.keyCode == Keyboard.A){
+		else if (e.keyCode == Keyboard.A && !contains(EndScreen.instance)){
 			endLevel();
 		}
 	}

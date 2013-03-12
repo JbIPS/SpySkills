@@ -5,10 +5,12 @@ import nme.Assets;
 import nme.display.Bitmap;
 import nme.display.Sprite;
 import nme.events.Event;
+import nme.events.FocusEvent;
 import nme.events.MouseEvent;
 import nme.events.HTTPStatusEvent;
 import nme.events.SecurityErrorEvent;
 import nme.events.IOErrorEvent;
+import nme.events.TextEvent;
 import nme.Lib;
 import nme.text.TextField;
 import nme.text.TextFormat;
@@ -128,17 +130,23 @@ class EndScreen extends Sprite
 			nameField.border = true;
 			nameField.borderColor = 0xFFFFFF;
 			nameField.defaultTextFormat = format;
-			nameField.text = "Nom...";
+			nameField.text = "Entre votre nom";
 			nameField.width = 300;
 			nameField.height = nameField.textHeight + 20;
 			nameField.y = submitText.y - submitText.height;
 			nameField.x = submitText.x;
 			nameField.alpha = 0;
+			nameField.addEventListener(FocusEvent.FOCUS_IN, onActivate);
 			addChild(nameField);
 			Actuate.tween(nameField, 1, { alpha: 1 } );
 		}
 		Actuate.tween(button, 1, { alpha: 1 } );
 		addChild(button);
+	}
+	
+	private function onActivate(e: Event) : Void 
+	{
+		nameField.text = "";
 	}
 	
 	public function onSubmit(e: MouseEvent): Void

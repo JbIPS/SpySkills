@@ -17,7 +17,7 @@ class Main
 		stage.scaleMode = nme.display.StageScaleMode.NO_SCALE;
 		stage.align = nme.display.StageAlign.TOP_LEFT;
 		
-		ExternalInterface.addCallback("quit", quit);
+		//ExternalInterface.addCallback("quit", quit);
 		displayMenu(null);
 	}
 	
