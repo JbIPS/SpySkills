@@ -35,6 +35,7 @@ class InterLevel extends Sprite {
     private var bookSprite: Sprite;
 	private var pageIndex: Int = 1;
 	private var sortRecipes: Array<Cocktail>;
+	private var menu: Sprite;
 
     public function setScore(score: Int): Int
     {
@@ -47,40 +48,150 @@ class InterLevel extends Sprite {
 
     private function setMenu(): Void
     {
-        var menu = new Sprite();
+        menu = new Sprite();
         menu.addChild(new Bitmap(Assets.getBitmapData("img/menu.png")));
         menu.y = height - menu.height;
         menu.x = 260;
-
+		
+		var container = new Sprite();
         var title = new TextField();
         title.embedFonts = true;
         title.defaultTextFormat = new TextFormat(Assets.getFont("font/bebas.ttf").fontName, 50, TextFormatAlign.CENTER);
         title.text = "Menu";
         title.width = menu.width;
         title.y = 55;
-        menu.addChild(title);
+		title.selectable = title.mouseEnabled = false;
+        container.addChild(title);
 
         var newIcon = new Bitmap(Assets.getBitmapData("img/b_newgame.png"));
         var newButton = new SimpleButton(newIcon, newIcon, newIcon, newIcon);
         newButton.x = 140;
         newButton.y = 180;
         newButton.addEventListener(MouseEvent.CLICK, startMethod);
-        menu.addChild(newButton);
+        container.addChild(newButton);
 
         var instrIcon = new Bitmap(Assets.getBitmapData("img/b_instructions.png"));
         var instrButton = new SimpleButton(instrIcon, instrIcon, instrIcon, instrIcon);
         instrButton.x = newButton.x;
         instrButton.y = newButton.y + 80;
-        menu.addChild(instrButton);
+        instrButton.addEventListener(MouseEvent.CLICK, showInstructions);
+        container.addChild(instrButton);
 
         var optionsIcon = new Bitmap(Assets.getBitmapData("img/b_options.png"));
         var optionsButton = new SimpleButton(optionsIcon, optionsIcon, optionsIcon, optionsIcon);
         optionsButton.x = instrButton.x;
         optionsButton.y = instrButton.y + 80;
-        menu.addChild(optionsButton);
-
+        optionsButton.addEventListener(MouseEvent.CLICK, showOptions);
+        container.addChild(optionsButton);
+		menu.addChild(container);
         addChild(menu);
     }
+	
+	private function showOptions(e: MouseEvent) : Void
+	{
+		menu.getChildAt(1).visible = false;
+		
+		var container = new Sprite();
+		var title = new TextField();
+        title.embedFonts = true;
+        title.defaultTextFormat = new TextFormat(Assets.getFont("font/bebas.ttf").fontName, 50, TextFormatAlign.CENTER);
+        title.text = "Options";
+        title.width = menu.width;
+        title.y = 55;
+		title.selectable = title.mouseEnabled = false;
+        container.addChild(title);
+		
+		var text = new TextField();
+		text.embedFonts = true;
+		text.defaultTextFormat = new TextFormat(Assets.getFont("font/blue_highway_cd.ttf").fontName, 35, TextFormatAlign.JUSTIFY);
+		text.text = "Son : ";
+		text.wordWrap = true;
+		text.autoSize = TextFieldAutoSize.CENTER;
+		text.selectable = text.mouseEnabled = false;
+		text.x = 90;
+		text.y = 200;
+		container.addChild(text);
+		
+		var mute = new Sprite();
+		mute.addChild(new Bitmap(Assets.getBitmapData("img/mute.png")));
+		mute.buttonMode = true;
+		mute.x = 300;
+		mute.y = 160;
+		Actuate.transform (mute, 0.1).color (0xCCCCCC, 1);
+		container.addChild(mute);
+		var unmute = new Sprite();
+		unmute.addChild(new Bitmap(Assets.getBitmapData("img/unmute.png")));
+		unmute.buttonMode = true;
+		unmute.x = 200;
+		unmute.y = 185;
+		Actuate.transform (unmute, 0.1).color (0xCCCCCC, 1);
+		container.addChild(unmute);
+		mute.addEventListener(MouseEvent.CLICK, function(e: MouseEvent) {
+			Actuate.transform (mute, 0.1).color (0xFF0000, 1);
+			Actuate.transform (unmute, 0.1).color (0xCCCCCC, 1);
+			Barman.mute = true;
+		});
+		unmute.addEventListener(MouseEvent.CLICK, function(e: MouseEvent) {
+			Actuate.transform (unmute, 0.1).color (0xFF0000, 1);
+			Actuate.transform (mute, 0.1).color (0xCCCCCC, 1);
+			Barman.mute = false;
+		});
+		
+		var backIcon = new Bitmap(Assets.getBitmapData("img/b_continue.png"));
+		var backButton = new SimpleButton(backIcon, backIcon, backIcon, backIcon);
+		backButton.x = menu.width - backButton.width - 25;
+        backButton.y = menu.height - backButton.height - 20;
+		backButton.addEventListener(MouseEvent.CLICK, function(e: MouseEvent) {
+			menu.removeChild(container);
+			container = null;
+			menu.getChildAt(1).visible = true;
+		});
+		container.addChild(backButton);
+		
+		menu.addChild(container);
+	}
+	
+	private function showInstructions(e: MouseEvent) : Void 
+	{
+		menu.getChildAt(1).visible = false;
+		
+		var container = new Sprite();
+		var title = new TextField();
+        title.embedFonts = true;
+        title.defaultTextFormat = new TextFormat(Assets.getFont("font/bebas.ttf").fontName, 50, TextFormatAlign.CENTER);
+        title.text = "Instructions";
+        title.width = menu.width;
+        title.y = 55;
+		title.selectable = title.mouseEnabled = false;
+        container.addChild(title);
+		
+		var text = new TextField();
+		text.embedFonts = true;
+		text.defaultTextFormat = new TextFormat(Assets.getFont("font/blue_highway_cd.ttf").fontName, 25, TextFormatAlign.JUSTIFY);
+		text.text = "Vous êtes derrière votre bar, un groupe de client arrive...";
+		text.text += "\nRéalisez le plus de cockails possible en 90 secondes et engrangez les points.";
+		text.text += "\nSi vous avez la mémoire courte, consultez votre livre de cocktails en bas à droite de l'écran.";
+		text.wordWrap = true;
+		text.autoSize = TextFieldAutoSize.CENTER;
+		text.selectable = text.mouseEnabled = false;
+		text.width = menu.width -100;
+		text.x = 50;
+		text.y = 180;
+		container.addChild(text);
+		
+		var backIcon = new Bitmap(Assets.getBitmapData("img/b_continue.png"));
+		var backButton = new SimpleButton(backIcon, backIcon, backIcon, backIcon);
+		backButton.x = menu.width - backButton.width - 25;
+        backButton.y = menu.height - backButton.height - 20;
+		backButton.addEventListener(MouseEvent.CLICK, function(e: MouseEvent) {
+			menu.removeChild(container);
+			container = null;
+			menu.getChildAt(1).visible = true;
+		});
+		container.addChild(backButton);
+		
+		menu.addChild(container);
+	}
 
     public function new(type: String, startMethod: Dynamic -> Void)
     {
@@ -202,15 +313,18 @@ class InterLevel extends Sprite {
 
     private function onRemove(e: Event): Void
     {
-        soundChannel.stop();
+		if(!Barman.mute)
+			soundChannel.stop();
     }
 
     private function onAdd(e: Event): Void
     {
-        var loop = Assets.getSound("sfx/interlevel.mp3");
-        soundChannel = loop.play();
-        var soundTransform = new SoundTransform(0.25);
-        soundChannel.soundTransform = soundTransform;
+		if(!Barman.mute){
+			var loop = Assets.getSound("sfx/interlevel.mp3");
+			soundChannel = loop.play(0, 10);
+			var soundTransform = new SoundTransform(0.25);
+			soundChannel.soundTransform = soundTransform;
+		}
     }
 
     private function setInterlevel(): Void

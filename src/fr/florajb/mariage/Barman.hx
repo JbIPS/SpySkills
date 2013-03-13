@@ -27,6 +27,8 @@ import nme.ui.Keyboard;
 
 class Barman extends Sprite 
 {	
+	public static var mute: Bool = false;
+	
 	private var shaker: Bitmap;
 	private var shakerSprite: Sprite;
 	private var score: Int;
@@ -177,10 +179,12 @@ class Barman extends Sprite
 		score = 0;
 		updateScore();
 		
-		var loop = Assets.getSound("sfx/loop.mp3");
-		soundChannel = loop.play();
-		var soundTransform = new SoundTransform(0.15);
-		soundChannel.soundTransform = soundTransform;
+		if(!mute){
+			var loop = Assets.getSound("sfx/loop.mp3");
+			soundChannel = loop.play(0, 10);
+			var soundTransform = new SoundTransform(0.15);
+			soundChannel.soundTransform = soundTransform;
+		}
 		
 		addCommand();
 	}
@@ -300,7 +304,8 @@ class Barman extends Sprite
 	
 	private function endLevel() : Void 
 	{
-		soundChannel.stop();
+		if(!mute)
+			soundChannel.stop();
 		
 		if (score >= objective) {
 			setPause(true);
