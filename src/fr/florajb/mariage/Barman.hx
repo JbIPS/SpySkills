@@ -12,6 +12,7 @@ import nme.events.MouseEvent;
 import nme.filters.DropShadowFilter;
 import nme.Lib;
 import nme.media.SoundChannel;
+import nme.media.Sound;
 import nme.media.SoundTransform;
 import nme.net.SharedObject;
 import nme.net.SharedObjectFlushStatus;
@@ -27,8 +28,9 @@ import nme.ui.Keyboard;
 
 class Barman extends Sprite 
 {	
-	public static var mute: Bool = false;
 	
+	public static var mute (default, setMute): Bool = false;
+	private static var soundChannel: SoundChannel;
 	private var shaker: Bitmap;
 	private var shakerSprite: Sprite;
 	private var score: Int;
@@ -43,10 +45,10 @@ class Barman extends Sprite
 	private var paused: Bool = false;
 	private var pauseTime: Int;
 	private var interLevel: InterLevel;
+	private var loop: Sound;
 	
 	private var ingredients: Array<Bottle>;
 	private var currentCommands: List<Command>;
-	private var soundChannel: SoundChannel;
 	
 	private var event:Event;
 	public function new() 
@@ -108,6 +110,24 @@ class Barman extends Sprite
 		levelField.text = "Niveau "+level;
 		addChild(levelField);
 		
+		var mute = new Sprite();
+		mute.addChild(new Bitmap(Assets.getBitmapData("img/unmute.png")));
+		mute.buttonMode = true;
+		mute.x = 190;
+		mute.y = 30;
+		mute.scaleX = mute.scaleY = 0.2;
+		mute.addEventListener(MouseEvent.CLICK, function(e: MouseEvent) {
+			if (Barman.mute){
+				cast(mute.getChildAt(0), Bitmap).bitmapData = Assets.getBitmapData("img/unmute.png");
+				Barman.mute = false;
+			}
+			else{
+				cast(mute.getChildAt(0), Bitmap).bitmapData = Assets.getBitmapData("img/mute.png");
+				Barman.mute = true;
+			}
+		});
+		addChild(mute);
+		
 		scoreField.selectable = scoreField.mouseEnabled = false;
 		scoreField.x = levelField.x;
 		scoreField.y = levelField.y+ 30;
@@ -128,6 +148,19 @@ class Barman extends Sprite
 		addChild(recipeButton);
 		
 		startLevel();
+	}
+	
+	private static function setMute(mute: Bool) : Bool 
+	{
+		if(mute){
+			var soundTransform = new SoundTransform(0);
+			soundChannel.soundTransform = soundTransform;
+		}
+		else{
+			var soundTransform = new SoundTransform(0.15);
+			soundChannel.soundTransform = soundTransform;
+		}
+		return Barman.mute = mute;
 	}
 	
 	private function cheat(e:KeyboardEvent):Void 
@@ -180,7 +213,7 @@ class Barman extends Sprite
 		updateScore();
 		
 		if(!mute){
-			var loop = Assets.getSound("sfx/loop.mp3");
+			loop = Assets.getSound("sfx/loop.mp3");
 			soundChannel = loop.play(0, 10);
 			var soundTransform = new SoundTransform(0.15);
 			soundChannel.soundTransform = soundTransform;
@@ -200,11 +233,12 @@ class Barman extends Sprite
 				currentCommands.remove(command);
 				correct = true;
 				validateCommand(command);
-				Assets.getSound("sfx/shaker.mp3").play();
+				if(!mute)
+					Assets.getSound("sfx/shaker.mp3").play();
 				break;
 			}
 		}
-		if (!correct)
+		if (!correct && !mute)
 			Assets.getSound("sfx/shaker_wrong.mp3").play();
 		clearIngredients();
 	}

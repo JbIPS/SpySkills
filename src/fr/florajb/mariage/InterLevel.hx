@@ -1,4 +1,5 @@
 package fr.florajb.mariage;
+
 import com.eclecticdesignstudio.motion.Actuate;
 import haxe.Timer;
 import nme.Assets;
@@ -73,21 +74,21 @@ class InterLevel extends Sprite {
         var instrIcon = new Bitmap(Assets.getBitmapData("img/b_instructions.png"));
         var instrButton = new SimpleButton(instrIcon, instrIcon, instrIcon, instrIcon);
         instrButton.x = newButton.x;
-        instrButton.y = newButton.y + 80;
+        instrButton.y = newButton.y + 130;
         instrButton.addEventListener(MouseEvent.CLICK, showInstructions);
         container.addChild(instrButton);
 
-        var optionsIcon = new Bitmap(Assets.getBitmapData("img/b_options.png"));
+        /*var optionsIcon = new Bitmap(Assets.getBitmapData("img/b_options.png"));
         var optionsButton = new SimpleButton(optionsIcon, optionsIcon, optionsIcon, optionsIcon);
         optionsButton.x = instrButton.x;
         optionsButton.y = instrButton.y + 80;
         optionsButton.addEventListener(MouseEvent.CLICK, showOptions);
-        container.addChild(optionsButton);
+        container.addChild(optionsButton);*/
 		menu.addChild(container);
         addChild(menu);
     }
 	
-	private function showOptions(e: MouseEvent) : Void
+	/*private function showOptions(e: MouseEvent) : Void
 	{
 		menu.getChildAt(1).visible = false;
 		
@@ -149,7 +150,7 @@ class InterLevel extends Sprite {
 		container.addChild(backButton);
 		
 		menu.addChild(container);
-	}
+	}*/
 	
 	private function showInstructions(e: MouseEvent) : Void 
 	{
@@ -181,7 +182,7 @@ class InterLevel extends Sprite {
 		
 		var backIcon = new Bitmap(Assets.getBitmapData("img/b_continue.png"));
 		var backButton = new SimpleButton(backIcon, backIcon, backIcon, backIcon);
-		backButton.x = menu.width - backButton.width - 25;
+		backButton.x = menu.width/2 - backButton.width/2;
         backButton.y = menu.height - backButton.height - 20;
 		backButton.addEventListener(MouseEvent.CLICK, function(e: MouseEvent) {
 			menu.removeChild(container);
