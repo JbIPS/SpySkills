@@ -37,6 +37,7 @@ class InterLevel extends Sprite {
 	private var pageIndex: Int = 1;
 	private var sortRecipes: Array<Cocktail>;
 	private var menu: Sprite;
+	private var mute: Bool;
 
     public function setScore(score: Int): Int
     {
@@ -215,6 +216,10 @@ class InterLevel extends Sprite {
 
     public function update(level: Int): Void
     {
+		if (level == 1)
+			mute = true;
+		else
+			mute = false;
 		var i = 0;
         while (bookSprite.numChildren > 2) {
 			if(Std.is(bookSprite.getChildAt(i), Sprite))
@@ -314,13 +319,13 @@ class InterLevel extends Sprite {
 
     private function onRemove(e: Event): Void
     {
-		if(!Barman.mute)
+		if(!Barman.mute && !mute)
 			soundChannel.stop();
     }
 
     private function onAdd(e: Event): Void
     {
-		if(!Barman.mute){
+		if(!Barman.mute && !mute){
 			var loop = Assets.getSound("sfx/interlevel.mp3");
 			soundChannel = loop.play(0, 10);
 			var soundTransform = new SoundTransform(0.25);
@@ -382,6 +387,9 @@ class InterLevel extends Sprite {
 
     private function displayIngredient(name: String): Sprite
     {
+		if (name == "cola" || name == "orange" || name == "ananas")
+			return null;
+			
         var ingredient = new Sprite();
         var icon = new Bitmap(Assets.getBitmapData("img/" + name + ".png"));
         if(name != "menthe" && name != "citron" && name != "coco")
@@ -400,6 +408,8 @@ class InterLevel extends Sprite {
 
     private function displayCocktail(cocktail: Cocktail): Sprite
     {
+		if (cocktail.name == "Jus d'orange" || cocktail.name == "Jus d'ananas" || cocktail.name == "Cola")
+			return null;
         var cocktailSprite = new Sprite();
         var icon = new Bitmap(cocktail.icon);
         var tf = new TextField();
@@ -437,8 +447,23 @@ class InterLevel extends Sprite {
     {
         var sprite = new Sprite();
         var newRecipes = LevelManager.getNewRecipes(level);
-        if(Lambda.count(newRecipes) == 0)
+		if (level == 2 || level == 5){
+			var cmd = new TextField();
+			cmd.embedFonts = true;
+			cmd.defaultTextFormat = new TextFormat(Assets.getFont("font/blue_highway_cd.ttf").fontName, 25, 0x000000, true);
+			cmd.text = "Nouvelle planche de commande !";
+			cmd.width = bookSprite.width / 2;
+			cmd.x = bookSprite.width / 2 + 20;
+			if (level == 2)
+				cmd.y = 30;
+			else
+				cmd.y = 65;
+			cmd.selectable = cmd.mouseEnabled = false;
+			sprite.addChild(cmd);
+		}
+        if (Lambda.count(newRecipes) == 0) {
             return sprite;
+		}
 
         var recipes = new TextField();
         recipes.embedFonts = true;
@@ -454,10 +479,12 @@ class InterLevel extends Sprite {
         var xOffset: Float = 50 + bookSprite.width / 2;
         for(recipe in newRecipes){
             var rec = displayCocktail(recipe);
-            rec.x = xOffset;
-            rec.y = yOffset + 5;
-            yOffset += rec.height;
-            sprite.addChild(rec);
+			if(rec != null){
+				rec.x = xOffset;
+				rec.y = yOffset + 5;
+				yOffset += rec.height;
+				sprite.addChild(rec);
+			}
         }
         return sprite;
     }
@@ -481,10 +508,12 @@ class InterLevel extends Sprite {
             var xOffset: Float = 70;
             for(ingredient in newIngredients){
                 var ing = displayIngredient(ingredient);
-                ing.x = xOffset;
-                ing.y = yOffset + 15;
-                yOffset += ing.height;
-                sprite.addChild(ing);
+				if(ing != null){
+					ing.x = xOffset;
+					ing.y = yOffset + 15;
+					yOffset += ing.height;
+					sprite.addChild(ing);
+				}
             }
         }
         return sprite;

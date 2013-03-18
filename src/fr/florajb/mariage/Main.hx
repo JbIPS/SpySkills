@@ -2,6 +2,7 @@ package fr.florajb.mariage;
 import nme.events.Event;
 import nme.Lib;
 import nme.external.ExternalInterface;
+import nme.system.System;
 
 /**
  * ...
@@ -17,7 +18,7 @@ class Main
 		stage.scaleMode = nme.display.StageScaleMode.NO_SCALE;
 		stage.align = nme.display.StageAlign.TOP_LEFT;
 		
-		//ExternalInterface.addCallback("quit", quit);
+		ExternalInterface.addCallback("quit", quit);
 		displayMenu(null);
 	}
 	
@@ -40,8 +41,11 @@ class Main
 		
 	}
 	
-	public static function quit(){
-		Lib.exit();
+	public static function quit() {
+		while(Lib.current.numChildren > 0){
+			Lib.current.removeChildAt(Lib.current.numChildren - 1);
+		}
+		displayMenu(null);
 	}
 	
 }

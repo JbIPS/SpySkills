@@ -35,6 +35,9 @@ class EndScreen extends Sprite
 	public dynamic function onContinue(e: MouseEvent) : Void { }
 	public dynamic function onRestart(e: MouseEvent) : Void { }
 	
+	public var text: String = "On ne vit que deux fois...";
+	public var withBlood: Bool = true;
+	
 	private var lives: Int = 2;
 	private var nameField: TextField;
 	
@@ -57,11 +60,15 @@ class EndScreen extends Sprite
 	{
 		visible = true;
 		addChild(new Bitmap(Assets.getBitmapData("img/canon.png")));
-		var blood = new Bitmap(Assets.getBitmapData("img/blood.png"));
-		blood.y = -blood.height;
-		blood.alpha = 0.5;
-		Actuate.tween(blood, 4, {y: 0}).ease(Cubic.easeOut).onComplete(checkContinue);
-		addChild(blood);
+		if(withBlood){
+			var blood = new Bitmap(Assets.getBitmapData("img/blood.png"));
+			blood.y = -blood.height;
+			blood.alpha = 0.5;
+			Actuate.tween(blood, 4, {y: 0}).ease(Cubic.easeOut).onComplete(checkContinue);
+			addChild(blood);
+		}
+		else
+			checkContinue();
 		
 	}
 	
@@ -74,16 +81,16 @@ class EndScreen extends Sprite
 	
 	private function checkContinue() : Void 
 	{
-		var format = new TextFormat("_sans", 25, 0xFFFFFF, true, false, true);
+		var format = new TextFormat(Assets.getFont("font/blue_highway_cd.ttf").fontName, 25, 0xFFFFFF, true, false, true);
 		format.align = TextFormatAlign.CENTER;
 		var continueField = new TextField();
 		continueField.defaultTextFormat = format;
-		continueField.text = "On ne vit que deux fois...";
+		continueField.text = text;
 		continueField.width = Lib.current.stage.stageWidth;
 		continueField.y = Lib.current.stage.stageHeight / 4;
 		continueField.selectable = continueField.mouseEnabled = false;
 		continueField.alpha = 0;
-		Actuate.tween(continueField, 1, { alpha: 1 } ).onComplete(createButton);
+		Actuate.tween(continueField, 0.5, { alpha: 1 } ).onComplete(createButton);
 		addChild(continueField);
 	}
 	
@@ -92,7 +99,7 @@ class EndScreen extends Sprite
 		lives --;
 		var button = new Sprite();
 		var continueText = new TextField();
-		var format = new TextFormat("_sans", 25, 0xFFFFFF, true);
+		var format = new TextFormat(Assets.getFont("font/blue_highway_cd.ttf").fontName, 25, 0xFFFFFF, true);
 		format.align = TextFormatAlign.CENTER;
 		continueText.defaultTextFormat = format;
 		continueText.width = Lib.current.stage.stageWidth;
@@ -102,7 +109,7 @@ class EndScreen extends Sprite
 		button.mouseChildren = false;
 		button.buttonMode = button.useHandCursor = true;
 		button.alpha = 0;
-		if (lives > 0) {
+		if (lives > 0 && withBlood) {
 			continueText.text = "Continuer";
 			button.addEventListener(MouseEvent.CLICK, onContinue);
 		}
@@ -121,24 +128,20 @@ class EndScreen extends Sprite
 			button2.addChild(submitText);
 			button2.mouseChildren = false;
 			button2.buttonMode = button2.useHandCursor = true;
-			button2.alpha = 0;
 			button2.addEventListener(MouseEvent.CLICK, onSubmit);
-			Actuate.tween(button2, 1, { alpha: 1 } );
 			addChild(button2);
 			nameField = new TextField();
 			nameField.type = TextFieldType.INPUT;
 			nameField.border = true;
 			nameField.borderColor = 0xFFFFFF;
 			nameField.defaultTextFormat = format;
-			nameField.text = "Entre votre nom";
+			nameField.text = "Entrez votre nom";
 			nameField.width = 300;
-			nameField.height = nameField.textHeight + 20;
-			nameField.y = submitText.y - submitText.height;
-			nameField.x = submitText.x;
-			nameField.alpha = 0;
+			nameField.height = nameField.textHeight + 10;
+			nameField.y = submitText.y - submitText.height + 60;
+			nameField.x = submitText.x + 50;
 			nameField.addEventListener(FocusEvent.FOCUS_IN, onActivate);
 			addChild(nameField);
-			Actuate.tween(nameField, 1, { alpha: 1 } );
 		}
 		Actuate.tween(button, 1, { alpha: 1 } );
 		addChild(button);
@@ -163,6 +166,8 @@ class EndScreen extends Sprite
 		loader.addEventListener(Event.COMPLETE, onComplete);
 		loader.addEventListener(IOErrorEvent.NETWORK_ERROR, onNetworkError);
 		loader.addEventListener(IOErrorEvent.IO_ERROR, onIOError);
+		
+		onRestart(null);
 	}
 
 	private function onComplete(evt:Event) {

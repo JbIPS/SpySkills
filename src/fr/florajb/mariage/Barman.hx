@@ -69,18 +69,24 @@ class Barman extends Sprite
 		addEventListener(Event.ADDED_TO_STAGE, init);
 		#end
 		addEventListener(Event.ENTER_FRAME, onEnterFrame);
+		addEventListener(Event.REMOVED_FROM_STAGE, onRemove);
 		//addEventListener(Event.DEACTIVATE, onSpace);
 		//addEventListener(Event.ACTIVATE, onSpace);
-		Lib.current.stage.addEventListener(KeyboardEvent.KEY_DOWN, cheat);
+		//Lib.current.stage.addEventListener(KeyboardEvent.KEY_DOWN, cheat);
 		interLevel = new InterLevel("interlevel", startProxy);
 		EndScreen.instance.onContinue = restartLevel;
 		EndScreen.instance.onRestart = restartGame;
+	}
+	
+	private function onRemove(e: Event) : Void 
+	{
+		mute = true;
 	}
 
 	private function init(e: Event) 
 	{	
 		removeEventListener(MouseEvent.CLICK, init);
-		
+		mute = false;
 		var bkg = new Bitmap(Assets.getBitmapData("img/Background.png"));
 		addChild(bkg);
 		
@@ -148,7 +154,9 @@ class Barman extends Sprite
 		recipeButton.y = height - recipeButton.height;
 		addChild(recipeButton);
 		
-		startLevel();
+		interLevel.score = score;
+		interLevel.update(level);
+		addChild(interLevel);
 	}
 	
 	private static function setMute(mute: Bool) : Bool 
@@ -196,17 +204,9 @@ class Barman extends Sprite
 	private function startLevel(restart: Bool = false) : Void 
 	{
 		if(!restart){
-			if(level > 1){
-				removeChild(interLevel);
-				initLevel();
-				initCookbook();
-			}
-			else{
-				interLevel.score = score;
-				interLevel.update(level);
-				addChild(interLevel);
-				return;
-			}
+			removeChild(interLevel);
+			initLevel();
+			initCookbook();
 		}
 		
 		setPause(false);
@@ -352,51 +352,12 @@ class Barman extends Sprite
 		if (score >= objective) {
 			setPause(true);
 			if (level == 10) {
-				var black = new Sprite();
-				black.graphics.beginFill(0x000000);
-				black.graphics.drawRect(0, 0, width, height);
-				black.graphics.endFill();
-				addChild(black);
-				addChild(new Bitmap(Assets.getBitmapData("img/canon.png")));
-				var tf = new TextField();
-				tf.embedFonts = true;
-				tf.defaultTextFormat = new TextFormat(Assets.getFont("font/blue_highway.ttf").fontName, 17, 0xFF0000, true, TextFormatAlign.CENTER);
-				tf.text = " Félicitations, vous maitrisez vos cocktails";
-				tf.text += "\n\n score : " + InterLevel.totalScore;
-				tf.width = Lib.current.stage.stageWidth;
-				tf.selectable = tf.mouseEnabled = false;
-				tf.y = 200;
-				addChild(tf);
-				
-				var submitSprite = new Sprite();
-				var submit = new TextField();
-				submit.embedFonts = true;
-				submit.defaultTextFormat = new TextFormat(Assets.getFont("font/blue_highway.ttf").fontName, 17, 0xFF0000, true);
-				submit.text = "Soumettre";
-				submit.selectable = false;
-				submit.y = 300;
-				submit.x = 300;
-				submit.height = submit.textHeight + 10;
-				submitSprite.addChild(submit);
-				submitSprite.mouseChildren = false;
-				submitSprite.buttonMode = submitSprite.useHandCursor = true;
-				submitSprite.addEventListener(MouseEvent.CLICK, onSubmit);
-				addChild(submitSprite);
-				
-				var restartSprite = new Sprite();
-				var restart = new TextField();
-				restart.embedFonts = true;
-				restart.defaultTextFormat = new TextFormat(Assets.getFont("font/blue_highway.ttf").fontName, 17, 0xFF0000, true);
-				restart.text = "Rejouer";
-				restart.selectable = false;
-				restart.y = 300;
-				restart.x = 450;
-				restart.height = restart.textHeight + 10;
-				restartSprite.addChild(restart);
-				restartSprite.mouseChildren = false;
-				restartSprite.buttonMode = restartSprite.useHandCursor = true;			
-				restartSprite.addEventListener(MouseEvent.CLICK, restartGame);
-				addChild(restartSprite);
+				setStageVisible(false);
+				setPause(true);
+				EndScreen.instance.withBlood = false;
+				EndScreen.instance.text = " Félicitations, vous maitrisez vos cocktails";
+				EndScreen.instance.text += "\n\n score : " + InterLevel.totalScore;
+				addChild(EndScreen.instance);				
 			}
 			else{
 				level++;
