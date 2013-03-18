@@ -41,9 +41,9 @@ class InterLevel extends Sprite {
     public function setScore(score: Int): Int
     {
         this.score = score;
-        scoreField.text = "Level: " + score + "pts";
+        scoreField.text = "Niveau : " + score + "pts";
         totalScore += score;
-        totalScoreField.text = "Total: " + totalScore + "pts";
+        totalScoreField.text = "Total : " + totalScore + "pts";
         return score;
     }
 
@@ -197,9 +197,9 @@ class InterLevel extends Sprite {
     public function new(type: String, startMethod: Dynamic -> Void)
     {
         super();
+        this.startMethod = startMethod;
 
         addChild(new Bitmap(Assets.getBitmapData("img/menubackground.png")));
-        this.startMethod = startMethod;
         cookFormat = new TextFormat(Assets.getFont("font/blue_highway.ttf").fontName, 15);
         titleFormat = new TextFormat(Assets.getFont("font/bebas.ttf").fontName, 20, TextFormatAlign.CENTER);
 

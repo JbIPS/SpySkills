@@ -42,7 +42,7 @@ class Barman extends Sprite
 	private var scoreField: TextField;
 	private var timerField: TextField;
 	private var levelField: TextField;
-	private var paused: Bool = false;
+	private var paused: Bool = true;
 	private var pauseTime: Int;
 	private var interLevel: InterLevel;
 	private var loop: Sound;
@@ -69,8 +69,8 @@ class Barman extends Sprite
 		addEventListener(Event.ADDED_TO_STAGE, init);
 		#end
 		addEventListener(Event.ENTER_FRAME, onEnterFrame);
-		addEventListener(Event.DEACTIVATE, onSpace);
-		addEventListener(Event.ACTIVATE, onSpace);
+		//addEventListener(Event.DEACTIVATE, onSpace);
+		//addEventListener(Event.ACTIVATE, onSpace);
 		Lib.current.stage.addEventListener(KeyboardEvent.KEY_DOWN, cheat);
 		interLevel = new InterLevel("interlevel", startProxy);
 		EndScreen.instance.onContinue = restartLevel;
@@ -126,6 +126,7 @@ class Barman extends Sprite
 				Barman.mute = true;
 			}
 		});
+		Actuate.transform(mute).color(0xFF0000);
 		addChild(mute);
 		
 		scoreField.selectable = scoreField.mouseEnabled = false;
@@ -194,16 +195,23 @@ class Barman extends Sprite
 	
 	private function startLevel(restart: Bool = false) : Void 
 	{
+		if(!restart){
+			if(level > 1){
+				removeChild(interLevel);
+				initLevel();
+				initCookbook();
+			}
+			else{
+				interLevel.score = score;
+				interLevel.update(level);
+				addChild(interLevel);
+				return;
+			}
+		}
+		
 		setPause(false);
 		clearCommands();
 		clearIngredients();
-		
-		if(!restart){
-			if(level > 1)
-				removeChild(interLevel);
-			initLevel();
-			initCookbook();
-		}
 		
 		startTime = Lib.getTimer();
 		objective = 500 * level;
