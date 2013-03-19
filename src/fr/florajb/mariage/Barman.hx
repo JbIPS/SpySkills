@@ -165,7 +165,7 @@ class Barman extends Sprite
 			var soundTransform = new SoundTransform(0);
 			soundChannel.soundTransform = soundTransform;
 		}
-		else{
+		else if(soundChannel != null){
 			var soundTransform = new SoundTransform(0.15);
 			soundChannel.soundTransform = soundTransform;
 		}
